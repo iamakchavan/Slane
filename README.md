@@ -1,7 +1,27 @@
-echo "# tooliq" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/bittucreator/tooliq.git
-git push -u origin main
+# Tooliq
+
+A minimal to-do app for founders and designers.
+
+## Getting Started
+
+Install dependencies:
+```bash
+npm install
+```
+
+Start development server:
+```bash
+npm run dev
+```
+
+Build for production:
+```bash
+npm run build
+```
+
+## Features
+
+- Clean, minimal interface
+- Task management with priorities
+- Responsive design
+- Mobile-friendly sidebar
