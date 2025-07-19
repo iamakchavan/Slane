@@ -15,6 +15,8 @@ import { Button } from "../../components/ui/button";
 import { Checkbox } from "../../components/ui/checkbox";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
+
+import { LinearTaskModal } from "../../components/LinearTaskModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,9 +24,19 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 
+interface Task {
+  id: string;
+  name: string;
+  description?: string;
+  completed: boolean;
+  priority: "high" | "medium" | "low";
+}
+
 export const Tasks = (): JSX.Element => {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
   // Task data for the sidebar
   const sidebarTasks = [
@@ -32,29 +44,37 @@ export const Tasks = (): JSX.Element => {
     { name: "Schedule a meeting", selected: true, hasNotification: true },
   ];
 
-  // Task data for the main content
-  const mainTasks = [
+  // Task data for the main content with proper state management
+  const [tasks, setTasks] = useState<Task[]>([
     {
+      id: "1",
       name: "Review project proposal for the new marketing campaign.",
+      description: "Go through the complete marketing proposal and provide detailed feedback on strategy, budget allocation, and timeline.",
       completed: false,
       priority: "high",
     },
     {
+      id: "2",
       name: "Schedule a meeting with the design team for feedback.",
+      description: "Set up a meeting to discuss the latest design iterations and gather feedback from the team.",
       completed: false,
       priority: "medium",
     },
     {
+      id: "3",
       name: "Have to create wireframes for the mobile app",
+      description: "Design low-fidelity wireframes for the main user flows in the mobile application.",
       completed: false,
       priority: "low",
     },
     {
+      id: "4",
       name: "Compile user feedback from the latest product release.",
+      description: "Gather and organize all user feedback received since the last release to identify key improvement areas.",
       completed: true,
       priority: "medium",
     },
-  ];
+  ]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -69,8 +89,61 @@ export const Tasks = (): JSX.Element => {
     }
   };
 
-  const toggleSidebar = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
+
+
+  const toggleTask = (taskId: string) => {
+    setTasks(tasks.map(task => 
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    ));
+  };
+
+  const createNewTask = (taskData: {
+    title: string;
+    description: string;
+    status: string;
+    priority: 'none' | 'low' | 'medium' | 'high';
+  }) => {
+    const newTask: Task = {
+      id: Date.now().toString(),
+      name: taskData.title,
+      description: taskData.description || undefined,
+      completed: false,
+      priority: taskData.priority === 'none' ? 'low' : taskData.priority,
+    };
+    setTasks([newTask, ...tasks]);
+  };
+
+  const deleteTask = (taskId: string) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+  };
+
+  const duplicateTask = (taskId: string) => {
+    const taskToDuplicate = tasks.find(task => task.id === taskId);
+    if (taskToDuplicate) {
+      const duplicatedTask: Task = {
+        ...taskToDuplicate,
+        id: Date.now().toString(),
+        name: `${taskToDuplicate.name} (Copy)`,
+        completed: false,
+      };
+      setTasks([duplicatedTask, ...tasks]);
+    }
+  };
+
+  const editTask = (taskId: string, newName: string) => {
+    setTasks(tasks.map(task => 
+      task.id === taskId ? { ...task, name: newName } : task
+    ));
+  };
+
+  const toggleTaskExpansion = (taskId: string) => {
+    const newExpanded = new Set(expandedTasks);
+    if (newExpanded.has(taskId)) {
+      newExpanded.delete(taskId);
+    } else {
+      newExpanded.add(taskId);
+    }
+    setExpandedTasks(newExpanded);
   };
 
   return (
@@ -205,6 +278,7 @@ export const Tasks = (): JSX.Element => {
             <Button 
               variant="outline" 
               size="sm" 
+              onClick={() => setNewTaskModalOpen(true)}
               className="gap-2 border-gray-200/60 hover:bg-gray-50/60 text-sm font-normal rounded-sm h-9 px-4 shadow-none hover:shadow-none transition-all"
             >
               <PlusIcon className="w-4 h-4" />
@@ -230,22 +304,36 @@ export const Tasks = (): JSX.Element => {
 
             {/* Task Rows */}
             <div className="divide-y divide-gray-200/40">
-              {mainTasks.map((task, index) => (
-                <div key={index} className="group hover:bg-gray-50/30 transition-colors">
+              {tasks.map((task) => (
+                <div key={task.id} className="group hover:bg-gray-50/30 transition-colors">
                   {/* Desktop Layout */}
                   <div className="hidden md:flex items-center gap-4 p-4">
                     <Checkbox 
                       checked={task.completed} 
+                      onCheckedChange={() => toggleTask(task.id)}
                       className="border-gray-300/80 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900"
                     />
                     <div className="flex-1 min-w-0">
-                      <span className={`text-sm leading-6 ${
-                        task.completed
-                          ? "text-gray-500 line-through"
-                          : "text-gray-900"
-                      }`}>
+                      <div
+                        className={`text-sm leading-6 cursor-pointer ${
+                          task.completed
+                            ? "text-gray-500 line-through"
+                            : "text-gray-900"
+                        }`}
+                        onClick={() => task.description && toggleTaskExpansion(task.id)}
+                      >
                         {task.name}
-                      </span>
+                        {task.description && (
+                          <span className="ml-2 text-xs text-gray-400">
+                            {expandedTasks.has(task.id) ? '▼' : '▶'}
+                          </span>
+                        )}
+                      </div>
+                      {task.description && expandedTasks.has(task.id) && (
+                        <div className="mt-2 text-xs text-gray-600 leading-relaxed">
+                          {task.description}
+                        </div>
+                      )}
                     </div>
                     <div className="w-24">
                       <Badge
@@ -267,9 +355,29 @@ export const Tasks = (): JSX.Element => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="shadow-sm border-gray-200/60 rounded-sm">
-                          <DropdownMenuItem className="text-sm">Edit</DropdownMenuItem>
-                          <DropdownMenuItem className="text-sm">Duplicate</DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600 text-sm">Delete</DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-sm"
+                            onClick={() => {
+                              const newName = prompt("Edit task name:", task.name);
+                              if (newName && newName.trim()) {
+                                editTask(task.id, newName.trim());
+                              }
+                            }}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-sm"
+                            onClick={() => duplicateTask(task.id)}
+                          >
+                            Duplicate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-red-600 text-sm"
+                            onClick={() => deleteTask(task.id)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -280,16 +388,30 @@ export const Tasks = (): JSX.Element => {
                     <div className="flex items-start gap-3">
                       <Checkbox 
                         checked={task.completed} 
+                        onCheckedChange={() => toggleTask(task.id)}
                         className="border-gray-300/80 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900 mt-0.5"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm leading-6 ${
-                          task.completed
-                            ? "text-gray-500 line-through"
-                            : "text-gray-900"
-                        }`}>
+                        <div
+                          className={`text-sm leading-6 cursor-pointer ${
+                            task.completed
+                              ? "text-gray-500 line-through"
+                              : "text-gray-900"
+                          }`}
+                          onClick={() => task.description && toggleTaskExpansion(task.id)}
+                        >
                           {task.name}
-                        </p>
+                          {task.description && (
+                            <span className="ml-2 text-xs text-gray-400">
+                              {expandedTasks.has(task.id) ? '▼' : '▶'}
+                            </span>
+                          )}
+                        </div>
+                        {task.description && expandedTasks.has(task.id) && (
+                          <div className="mt-2 text-xs text-gray-600 leading-relaxed">
+                            {task.description}
+                          </div>
+                        )}
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -302,9 +424,29 @@ export const Tasks = (): JSX.Element => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="shadow-sm border-gray-200/60 rounded-sm">
-                          <DropdownMenuItem className="text-sm">Edit</DropdownMenuItem>
-                          <DropdownMenuItem className="text-sm">Duplicate</DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600 text-sm">Delete</DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-sm"
+                            onClick={() => {
+                              const newName = prompt("Edit task name:", task.name);
+                              if (newName && newName.trim()) {
+                                editTask(task.id, newName.trim());
+                              }
+                            }}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-sm"
+                            onClick={() => duplicateTask(task.id)}
+                          >
+                            Duplicate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-red-600 text-sm"
+                            onClick={() => deleteTask(task.id)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -323,6 +465,13 @@ export const Tasks = (): JSX.Element => {
           </div>
         </div>
       </main>
+
+      {/* Linear Task Modal */}
+      <LinearTaskModal
+        isOpen={newTaskModalOpen}
+        onClose={() => setNewTaskModalOpen(false)}
+        onCreateTask={createNewTask}
+      />
     </div>
   );
 };
