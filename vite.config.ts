@@ -21,7 +21,7 @@ export default defineConfig({
         manualChunks: {
           vendor: ["react", "react-dom"],
           ui: ["@radix-ui/react-avatar", "@radix-ui/react-checkbox", "@radix-ui/react-dropdown-menu"],
-        },
+    },
       },
     },
   },
