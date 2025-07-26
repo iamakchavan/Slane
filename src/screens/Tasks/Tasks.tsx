@@ -278,25 +278,6 @@ export const Tasks = (): JSX.Element => {
           <div className="flex-1 flex flex-col">
             <div className="flex-1">
               <div className="space-y-3 mb-6">
-                {/* Quick Stats */}
-                <div className="bg-gray-50/50 rounded-sm p-3 mb-4">
-                  <div className="text-xs text-gray-500 mb-2">Quick Stats</div>
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">Total Tasks</span>
-                      <span className="font-medium">{tasks.length}</span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">Completed</span>
-                      <span className="font-medium text-green-600">{tasks.filter(t => t.completed).length}</span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">Remaining</span>
-                      <span className="font-medium text-blue-600">{tasks.filter(t => !t.completed).length}</span>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Tasks Header */}
                 <div className="flex items-center justify-between">
                   <span className="font-normal text-sm text-gray-900">Filters</span>
@@ -327,93 +308,115 @@ export const Tasks = (): JSX.Element => {
 
             {/* User Profile - Positioned at bottom */}
             <div className="border-t border-gray-200/60 pt-4 mt-auto pb-4">
-              {!showAccountUI ? (
-                <div 
-                  className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-gray-100/40 cursor-pointer transition-colors"
-                  onClick={() => setShowAccountUI(true)}
-                >
-                  <Avatar className="w-8 h-8 shadow-sm">
-                    <AvatarImage src="/inbox-2.png" alt="User avatar" />
-                    <AvatarFallback className="text-xs bg-gray-100 text-gray-600 font-normal">BC</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-normal truncate text-gray-900">
-                      bittucreators@gmail.com
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Free Plan
-                    </p>
+              <div className="overflow-hidden">
+                {!showAccountUI ? (
+                  <div 
+                    className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-gray-100/40 cursor-pointer transition-all duration-500 ease-out"
+                    onClick={() => setShowAccountUI(true)}
+                  >
+                    <Avatar className="w-8 h-8 shadow-sm">
+                      <AvatarImage src="/inbox-2.png" alt="User avatar" />
+                      <AvatarFallback className="text-xs bg-gray-100 text-gray-600 font-normal">BC</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-normal truncate text-gray-900">
+                        bittucreators@gmail.com
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Free Plan
+                      </p>
+                    </div>
+                    <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform duration-500 ease-out ${showAccountUI ? 'rotate-180' : ''}`} />
                   </div>
-                  <ChevronDownIcon className="w-4 h-4 text-gray-400" />
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Account Header */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">Account</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setShowAccountUI(false)}
-                      className="w-6 h-6 hover:bg-gray-100/60 rounded-sm"
+                ) : (
+                  <div 
+                    className="space-y-4 transition-all duration-700 ease-out"
+                    style={{
+                      animation: showAccountUI ? 'slideInUp 0.6s ease-out forwards' : 'slideOutDown 0.4s ease-in forwards'
+                    }}
+                  >
+                    {/* Account Header */}
+                    <div 
+                      className="flex items-center justify-between opacity-0"
+                      style={{
+                        animation: showAccountUI ? 'fadeInSlide 0.5s ease-out 0.1s forwards' : 'none'
+                      }}
                     >
-                      <X className="w-3 h-3 text-gray-400" />
-                    </Button>
-                  </div>
-
-                  {/* Profile Section */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-2.5 bg-gray-50/50 rounded-sm">
-                      <Avatar className="w-10 h-10 shadow-sm">
-                        <AvatarImage src="/inbox-2.png" alt="User avatar" />
-                        <AvatarFallback className="text-sm bg-gray-100 text-gray-600 font-normal">BC</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">
-                          Bittu Creators
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          bittucreators@gmail.com
-                        </p>
-                      </div>
+                      <span className="text-sm font-medium text-gray-900">Account</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setShowAccountUI(false)}
+                        className="w-6 h-6 hover:bg-gray-100/60 rounded-sm transition-all duration-300 ease-out"
+                      >
+                        <X className="w-3 h-3 text-gray-400 transition-all duration-300 ease-out" />
+                      </Button>
                     </div>
 
-                    {/* Plan Info */}
-                    <div className="p-2.5 bg-blue-50/50 rounded-sm border border-blue-100/50">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs font-medium text-blue-900">Free Plan</p>
-                          <p className="text-xs text-blue-600">Basic features</p>
+                    {/* Profile Section */}
+                    <div 
+                      className="space-y-3 opacity-0"
+                      style={{
+                        animation: showAccountUI ? 'fadeInSlide 0.5s ease-out 0.2s forwards' : 'none'
+                      }}
+                    >
+                      <div className="flex items-center gap-3 p-2.5 bg-gray-50/50 rounded-sm transition-all duration-400 ease-out hover:bg-gray-50/80">
+                        <Avatar className="w-10 h-10 shadow-sm transition-all duration-400 ease-out">
+                          <AvatarImage src="/inbox-2.png" alt="User avatar" />
+                          <AvatarFallback className="text-sm bg-gray-100 text-gray-600 font-normal">BC</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900">
+                            Bittu Creators
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            bittucreators@gmail.com
+                          </p>
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-xs h-7 px-3 border-blue-200 text-blue-700 hover:bg-blue-50"
-                          onClick={() => setShowPricingModal(true)}
-                        >
-                          Upgrade
+                      </div>
+
+                      {/* Plan Info */}
+                      <div className="p-2.5 bg-blue-50/50 rounded-sm border border-blue-100/50 transition-all duration-400 ease-out hover:bg-blue-50/70">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-blue-900">Free Plan</p>
+                            <p className="text-xs text-blue-600">Basic features</p>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs h-7 px-3 border-blue-200 text-blue-700 hover:bg-blue-50 transition-all duration-300 ease-out"
+                            onClick={() => setShowPricingModal(true)}
+                          >
+                            Upgrade
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Account Actions */}
+                      <div 
+                        className="space-y-1 opacity-0"
+                        style={{
+                          animation: showAccountUI ? 'fadeInSlide 0.5s ease-out 0.3s forwards' : 'none'
+                        }}
+                      >
+                        <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm flex items-center gap-3 transition-all duration-300 ease-out">
+                          <Settings className="w-4 h-4 text-gray-500 transition-all duration-300 ease-out" />
+                          Settings
+                        </Button>
+                        <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm flex items-center gap-3 transition-all duration-300 ease-out">
+                          <LifeBuoy className="w-4 h-4 text-gray-500 transition-all duration-300 ease-out" />
+                          Help & Support
+                        </Button>
+                        <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm text-red-600 hover:text-red-700 hover:bg-red-50/50 flex items-center gap-3 transition-all duration-300 ease-out">
+                          <LogOut className="w-4 h-4 text-red-500 transition-all duration-300 ease-out" />
+                          Sign Out
                         </Button>
                       </div>
                     </div>
-
-                    {/* Account Actions */}
-                    <div className="space-y-1">
-                      <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm flex items-center gap-3">
-                        <Settings className="w-4 h-4 text-gray-500" />
-                        Settings
-                      </Button>
-                      <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm flex items-center gap-3">
-                        <LifeBuoy className="w-4 h-4 text-gray-500" />
-                        Help & Support
-                      </Button>
-                      <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm text-red-600 hover:text-red-700 hover:bg-red-50/50 flex items-center gap-3">
-                        <LogOut className="w-4 h-4 text-red-500" />
-                        Sign Out
-                      </Button>
-                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
