@@ -26,6 +26,7 @@ import { Badge } from "../../components/ui/badge";
 
 import { LinearTaskModal } from "../../components/LinearTaskModal";
 import { PricingModal } from "../../components/PricingModal";
+import { SettingsModal } from "../../components/SettingsModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,9 +44,9 @@ interface Task {
 
 export const Tasks = (): JSX.Element => {
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
-  
+
 
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -98,6 +99,25 @@ export const Tasks = (): JSX.Element => {
   const [activeFilter, setActiveFilter] = useState("1");
   const [showAccountUI, setShowAccountUI] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  // For smooth account panel close animation
+  const [isAccountPanelVisible, setIsAccountPanelVisible] = useState(false);
+  const [isAccountPanelClosing, setIsAccountPanelClosing] = useState(false);
+
+  // Handle mounting/unmounting for animation
+  useEffect(() => {
+    if (showAccountUI) {
+      setIsAccountPanelVisible(true);
+      setIsAccountPanelClosing(false);
+    } else if (isAccountPanelVisible) {
+      setIsAccountPanelClosing(true);
+      const timeout = setTimeout(() => {
+        setIsAccountPanelVisible(false);
+        setIsAccountPanelClosing(false);
+      }, 300); // match animation duration
+      return () => clearTimeout(timeout);
+    }
+  }, [showAccountUI]);
 
   // Computed sidebar data based on current tasks
   const sidebarItems = [
@@ -120,7 +140,7 @@ export const Tasks = (): JSX.Element => {
 
 
   const toggleTask = (taskId: string) => {
-    setTasks(tasks.map(task => 
+    setTasks(tasks.map(task =>
       task.id === taskId ? { ...task, completed: !task.completed } : task
     ));
   };
@@ -159,7 +179,7 @@ export const Tasks = (): JSX.Element => {
   };
 
   const editTask = (taskId: string, newName: string) => {
-    setTasks(tasks.map(task => 
+    setTasks(tasks.map(task =>
       task.id === taskId ? { ...task, name: newName } : task
     ));
   };
@@ -183,17 +203,17 @@ export const Tasks = (): JSX.Element => {
         if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) {
           return;
         }
-        
+
         // Check if user is typing in an input field
         const activeElement = document.activeElement;
         if (activeElement && (
-          activeElement.tagName === 'INPUT' || 
+          activeElement.tagName === 'INPUT' ||
           activeElement.tagName === 'TEXTAREA' ||
           (activeElement as HTMLElement).contentEditable === 'true'
         )) {
           return;
         }
-        
+
         // All checks passed - open modal
         event.preventDefault();
         event.stopPropagation();
@@ -212,22 +232,21 @@ export const Tasks = (): JSX.Element => {
   return (
     <div className="bg-gray-50/30 flex w-full min-h-screen">
       {/* Mobile Overlay */}
-      {mobileMenuOpen && (
-        <div 
+      {sidebarOpen && (
+        <div
           className="fixed inset-0 bg-black/20 z-40 lg:hidden"
-          onClick={() => setMobileMenuOpen(false)}
+          onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 lg:relative lg:z-auto
+        fixed inset-y-0 left-0 z-50
         flex flex-col min-h-screen bg-white border-r border-gray-200/60
         transition-all duration-300 ease-in-out
-        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         w-72
         shadow-sm lg:shadow-none
-        ${mobileMenuOpen ? 'lg:w-72' : 'lg:w-0 lg:overflow-hidden'}
       `}>
         <div className="flex flex-col min-h-screen p-4 w-full">
           {/* Sidebar Header */}
@@ -248,16 +267,19 @@ export const Tasks = (): JSX.Element => {
                     <Building2 className="w-4 h-4 text-gray-500" />
                     Switch workspace
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-sm flex items-center gap-3">
+                  <DropdownMenuItem 
+                    className="text-sm flex items-center gap-3"
+                    onClick={() => setShowSettingsModal(true)}
+                  >
                     <Settings className="w-4 h-4 text-gray-500" />
                     Settings
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => setSidebarOpen(false)}
                 className="w-8 h-8 hover:bg-gray-100/60 rounded-sm transition-colors lg:hidden"
               >
                 <PanelLeftIcon className="w-4 h-4 text-gray-600" />
@@ -290,9 +312,8 @@ export const Tasks = (): JSX.Element => {
                     <div
                       key={item.id}
                       onClick={() => setActiveFilter(item.id)}
-                      className={`flex items-center justify-between p-2.5 rounded-sm text-sm transition-all hover:bg-gray-100/40 cursor-pointer ${
-                        item.selected ? "bg-gray-100/80" : ""
-                      }`}
+                      className={`flex items-center justify-between p-2.5 rounded-sm text-sm transition-all hover:bg-gray-100/40 cursor-pointer ${item.selected ? "bg-gray-100/80" : ""
+                        }`}
                     >
                       <span className="text-gray-700 truncate text-sm font-normal">
                         {item.name}
@@ -308,130 +329,131 @@ export const Tasks = (): JSX.Element => {
 
             {/* User Profile - Positioned at bottom */}
             <div className="border-t border-gray-200/60 pt-4 mt-auto pb-4">
-              <div className="overflow-hidden">
-                {!showAccountUI ? (
-                  <div 
-                    className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-gray-100/40 cursor-pointer transition-all duration-500 ease-out"
-                    onClick={() => setShowAccountUI(true)}
-                  >
-                    <Avatar className="w-8 h-8 shadow-sm">
-                      <AvatarImage src="/inbox-2.png" alt="User avatar" />
-                      <AvatarFallback className="text-xs bg-gray-100 text-gray-600 font-normal">BC</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-normal truncate text-gray-900">
-                        bittucreators@gmail.com
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Free Plan
-                      </p>
-                    </div>
-                    <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform duration-500 ease-out ${showAccountUI ? 'rotate-180' : ''}`} />
+              {!showAccountUI ? (
+                <div
+                  className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-gray-100/40 cursor-pointer transition-colors"
+                  onClick={() => setShowAccountUI(true)}
+                >
+                  <Avatar className="w-8 h-8 shadow-sm">
+                    <AvatarImage src="/inbox-2.png" alt="User avatar" />
+                    <AvatarFallback className="text-xs bg-gray-100 text-gray-600 font-normal">BC</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-normal truncate text-gray-900">
+                      bittucreators@gmail.com
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Free Plan
+                    </p>
                   </div>
-                ) : (
-                  <div 
-                    className="space-y-4 transition-all duration-700 ease-out"
+                  <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+                </div>
+              ) : (
+                isAccountPanelVisible && (
+                  <div
+                    className={`transition-all duration-300 ease-out transform ${isAccountPanelClosing
+                      ? 'opacity-0 translate-y-6 pointer-events-none'
+                      : 'opacity-100 translate-y-0'
+                      }`}
                     style={{
-                      animation: showAccountUI ? 'slideInUp 0.6s ease-out forwards' : 'slideOutDown 0.4s ease-in forwards'
+                      animation: !isAccountPanelClosing ? 'fadeInUp 0.3s cubic-bezier(0.4,0,0.2,1)' : undefined
                     }}
                   >
-                    {/* Account Header */}
-                    <div 
-                      className="flex items-center justify-between opacity-0"
-                      style={{
-                        animation: showAccountUI ? 'fadeInSlide 0.5s ease-out 0.1s forwards' : 'none'
-                      }}
-                    >
-                      <span className="text-sm font-medium text-gray-900">Account</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setShowAccountUI(false)}
-                        className="w-6 h-6 hover:bg-gray-100/60 rounded-sm transition-all duration-300 ease-out"
-                      >
-                        <X className="w-3 h-3 text-gray-400 transition-all duration-300 ease-out" />
-                      </Button>
-                    </div>
-
-                    {/* Profile Section */}
-                    <div 
-                      className="space-y-3 opacity-0"
-                      style={{
-                        animation: showAccountUI ? 'fadeInSlide 0.5s ease-out 0.2s forwards' : 'none'
-                      }}
-                    >
-                      <div className="flex items-center gap-3 p-2.5 bg-gray-50/50 rounded-sm transition-all duration-400 ease-out hover:bg-gray-50/80">
-                        <Avatar className="w-10 h-10 shadow-sm transition-all duration-400 ease-out">
-                          <AvatarImage src="/inbox-2.png" alt="User avatar" />
-                          <AvatarFallback className="text-sm bg-gray-100 text-gray-600 font-normal">BC</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900">
-                            Bittu Creators
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            bittucreators@gmail.com
-                          </p>
-                        </div>
+                    <style>{`
+                      @keyframes fadeInUp {
+                        0% { opacity: 0; transform: translateY(24px); }
+                        100% { opacity: 1; transform: translateY(0); }
+                      }
+                    `}</style>
+                    <div className="space-y-4">
+                      {/* Account Header */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-900">Account</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setShowAccountUI(false)}
+                          className="w-6 h-6 hover:bg-gray-100/60 rounded-sm"
+                        >
+                          <X className="w-3 h-3 text-gray-400" />
+                        </Button>
                       </div>
 
-                      {/* Plan Info */}
-                      <div className="p-2.5 bg-blue-50/50 rounded-sm border border-blue-100/50 transition-all duration-400 ease-out hover:bg-blue-50/70">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-medium text-blue-900">Free Plan</p>
-                            <p className="text-xs text-blue-600">Basic features</p>
+                      {/* Profile Section */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3 p-2.5 bg-gray-50/50 rounded-sm">
+                          <Avatar className="w-10 h-10 shadow-sm">
+                            <AvatarImage src="/inbox-2.png" alt="User avatar" />
+                            <AvatarFallback className="text-sm bg-gray-100 text-gray-600 font-normal">BC</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900">
+                              Bittu Creators
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              bittucreators@gmail.com
+                            </p>
                           </div>
+                        </div>
+
+                        {/* Plan Info */}
+                        <div className="p-2.5 bg-blue-50/50 rounded-sm border border-blue-100/50">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-xs font-medium text-blue-900">Free Plan</p>
+                              <p className="text-xs text-blue-600">Basic features</p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-7 px-3 border-blue-200 text-blue-700 hover:bg-blue-50"
+                              onClick={() => setShowPricingModal(true)}
+                            >
+                              Upgrade
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Account Actions */}
+                        <div className="space-y-1">
                           <Button 
-                            variant="outline" 
+                            variant="ghost" 
                             size="sm" 
-                            className="text-xs h-7 px-3 border-blue-200 text-blue-700 hover:bg-blue-50 transition-all duration-300 ease-out"
-                            onClick={() => setShowPricingModal(true)}
+                            onClick={() => setShowSettingsModal(true)}
+                            className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm flex items-center gap-3"
                           >
-                            Upgrade
+                            <Settings className="w-4 h-4 text-gray-500" />
+                            Settings
+                          </Button>
+                          <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm flex items-center gap-3">
+                            <LifeBuoy className="w-4 h-4 text-gray-500" />
+                            Help & Support
+                          </Button>
+                          <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm text-red-600 hover:text-red-700 hover:bg-red-50/50 flex items-center gap-3">
+                            <LogOut className="w-4 h-4 text-red-500" />
+                            Sign Out
                           </Button>
                         </div>
                       </div>
-
-                      {/* Account Actions */}
-                      <div 
-                        className="space-y-1 opacity-0"
-                        style={{
-                          animation: showAccountUI ? 'fadeInSlide 0.5s ease-out 0.3s forwards' : 'none'
-                        }}
-                      >
-                        <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm flex items-center gap-3 transition-all duration-300 ease-out">
-                          <Settings className="w-4 h-4 text-gray-500 transition-all duration-300 ease-out" />
-                          Settings
-                        </Button>
-                        <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm flex items-center gap-3 transition-all duration-300 ease-out">
-                          <LifeBuoy className="w-4 h-4 text-gray-500 transition-all duration-300 ease-out" />
-                          Help & Support
-                        </Button>
-                        <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm text-red-600 hover:text-red-700 hover:bg-red-50/50 flex items-center gap-3 transition-all duration-300 ease-out">
-                          <LogOut className="w-4 h-4 text-red-500 transition-all duration-300 ease-out" />
-                          Sign Out
-                        </Button>
-                      </div>
                     </div>
                   </div>
-                )}
-              </div>
+                )
+              )}
             </div>
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col bg-white min-w-0 lg:ml-0 transition-all duration-300 ease-in-out">
-        {/* Header */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-gray-200/60 bg-white">
+      <main className={`flex-1 flex flex-col bg-white min-w-0 transition-all duration-300 ease-in-out h-screen ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-0'}`}>
+        {/* Sticky Header */}
+        <header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-gray-200/60 bg-white">
           <div className="flex items-center gap-3">
             {/* Sidebar Toggle Button */}
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => setSidebarOpen(!sidebarOpen)}
               className="w-8 h-8 hover:bg-gray-100/60 rounded-sm transition-colors"
             >
               <PanelLeftIcon className="w-4 h-4 text-gray-600" />
@@ -442,9 +464,9 @@ export const Tasks = (): JSX.Element => {
 
           <div className="flex items-center gap-3">
             {/* New Task Button */}
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setNewTaskModalOpen(true)}
               className="gap-2 border-gray-200/60 hover:bg-gray-50/60 text-sm font-normal rounded-sm h-9 px-4 shadow-none hover:shadow-none transition-all"
             >
@@ -455,11 +477,11 @@ export const Tasks = (): JSX.Element => {
           </div>
         </header>
 
-        {/* Task Content */}
-        <div className="flex-1 p-6 bg-gray-50/30">
-          <div className="border border-gray-200/60 rounded-sm overflow-hidden bg-white shadow-sm hover:shadow-sm transition-shadow">
-            {/* Desktop Table Header */}
-            <div className="hidden md:flex items-center gap-4 p-4 border-b border-gray-200/60 bg-gray-50/20">
+        {/* Scrollable Task Content */}
+        <div className="flex-1 overflow-y-auto scrollbar-minimal p-6 bg-gray-50/30">
+          <div className="border border-gray-200/60 rounded-sm bg-white shadow-sm hover:shadow-sm transition-shadow">
+            {/* Sticky Desktop Table Header */}
+            <div className="hidden md:flex items-center gap-4 p-4 border-b border-gray-200/60 bg-gray-50/20 sticky top-0 z-10">
               <Checkbox className="border-gray-300/80 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900" />
               <div className="flex-1">
                 <span className="font-normal text-sm text-gray-600">Name</span>
@@ -470,31 +492,30 @@ export const Tasks = (): JSX.Element => {
               <div className="w-10" />
             </div>
 
-            {/* Task Rows */}
-            <div className="divide-y divide-gray-200/40">
+            {/* Scrollable Task Rows */}
+            <div className="divide-y divide-gray-200/40 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-minimal">
               {filteredTasks.map((task) => (
                 <div key={task.id} className="group hover:bg-gray-50/30 transition-colors">
                   {/* Desktop Layout */}
                   <div className="hidden md:flex items-center gap-4 p-4">
-                    <Checkbox 
-                      checked={task.completed} 
+                    <Checkbox
+                      checked={task.completed}
                       onCheckedChange={() => toggleTask(task.id)}
                       className="border-gray-300/80 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900"
                     />
                     <div className="flex-1 min-w-0">
                       <div
-                        className={`text-sm leading-6 cursor-pointer ${
-                        task.completed
+                        className={`text-sm leading-6 cursor-pointer ${task.completed
                           ? "text-gray-500 line-through"
                           : "text-gray-900"
-                        }`}
+                          }`}
                         onClick={() => task.description && toggleTaskExpansion(task.id)}
                       >
                         {task.name}
                         {task.description && (
                           <span className="ml-2 text-xs text-gray-400">
                             {expandedTasks.has(task.id) ? '▼' : '▶'}
-                      </span>
+                          </span>
                         )}
                       </div>
                       {task.description && expandedTasks.has(task.id) && (
@@ -514,16 +535,16 @@ export const Tasks = (): JSX.Element => {
                     <div className="w-10">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="w-8 h-8 hover:bg-gray-100/60 opacity-0 group-hover:opacity-100 transition-all rounded-sm"
                           >
                             <MoreHorizontalIcon className="w-4 h-4 text-gray-400" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="shadow-sm border-gray-200/60 rounded-sm">
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="text-sm flex items-center gap-3"
                             onClick={() => {
                               const newName = prompt("Edit task name:", task.name);
@@ -535,14 +556,14 @@ export const Tasks = (): JSX.Element => {
                             <Edit className="w-4 h-4 text-gray-500" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="text-sm flex items-center gap-3"
                             onClick={() => duplicateTask(task.id)}
                           >
                             <Copy className="w-4 h-4 text-gray-500" />
                             Duplicate
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="text-red-600 text-sm flex items-center gap-3"
                             onClick={() => deleteTask(task.id)}
                           >
@@ -557,18 +578,17 @@ export const Tasks = (): JSX.Element => {
                   {/* Mobile Layout */}
                   <div className="md:hidden p-4 space-y-3">
                     <div className="flex items-start gap-3">
-                      <Checkbox 
-                        checked={task.completed} 
+                      <Checkbox
+                        checked={task.completed}
                         onCheckedChange={() => toggleTask(task.id)}
                         className="border-gray-300/80 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900 mt-0.5"
                       />
                       <div className="flex-1 min-w-0">
                         <div
-                          className={`text-sm leading-6 cursor-pointer ${
-                          task.completed
+                          className={`text-sm leading-6 cursor-pointer ${task.completed
                             ? "text-gray-500 line-through"
                             : "text-gray-900"
-                          }`}
+                            }`}
                           onClick={() => task.description && toggleTaskExpansion(task.id)}
                         >
                           {task.name}
@@ -586,16 +606,16 @@ export const Tasks = (): JSX.Element => {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="w-8 h-8 hover:bg-gray-100/60 -mr-2 rounded-sm"
                           >
                             <MoreHorizontalIcon className="w-4 h-4 text-gray-400" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="shadow-sm border-gray-200/60 rounded-sm">
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="text-sm flex items-center gap-3"
                             onClick={() => {
                               const newName = prompt("Edit task name:", task.name);
@@ -607,14 +627,14 @@ export const Tasks = (): JSX.Element => {
                             <Edit className="w-4 h-4 text-gray-500" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="text-sm flex items-center gap-3"
                             onClick={() => duplicateTask(task.id)}
                           >
                             <Copy className="w-4 h-4 text-gray-500" />
                             Duplicate
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="text-red-600 text-sm flex items-center gap-3"
                             onClick={() => deleteTask(task.id)}
                           >
@@ -651,6 +671,12 @@ export const Tasks = (): JSX.Element => {
       <PricingModal
         isOpen={showPricingModal}
         onClose={() => setShowPricingModal(false)}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
       />
     </div>
   );
