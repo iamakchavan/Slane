@@ -340,7 +340,7 @@ export const Tasks = (): JSX.Element => {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-normal truncate text-gray-900">
-                      bittucreators@gmail.com
+                      Bittu Creators
                     </p>
                     <p className="text-xs text-gray-500">
                       Free Plan
@@ -677,6 +677,10 @@ export const Tasks = (): JSX.Element => {
       <SettingsModal
         isOpen={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
+        onOpenPricing={() => {
+          setShowSettingsModal(false);
+          setShowPricingModal(true);
+        }}
       />
     </div>
   );

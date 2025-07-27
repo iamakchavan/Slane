@@ -13,11 +13,13 @@ import {
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenPricing: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
+  onOpenPricing,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
@@ -338,6 +340,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <Button 
                       variant="outline" 
                       size="sm" 
+                      onClick={onOpenPricing}
                       className="text-xs h-8 px-3 border-blue-200 text-blue-700 hover:bg-blue-50"
                     >
                       Upgrade
