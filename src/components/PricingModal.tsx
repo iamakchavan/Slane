@@ -33,8 +33,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ease-out ${
-        isVisible ? 'bg-black/20 backdrop-blur-sm' : 'bg-black/0'
+      className={`fixed inset-0 z-[60] flex items-center justify-center p-4 transition-all duration-300 ease-out ${
+        isVisible ? 'bg-black/30 backdrop-blur-md' : 'bg-black/0'
       }`}
       onClick={handleClose}
     >

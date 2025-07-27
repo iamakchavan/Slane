@@ -677,10 +677,7 @@ export const Tasks = (): JSX.Element => {
       <SettingsModal
         isOpen={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
-        onOpenPricing={() => {
-          setShowSettingsModal(false);
-          setShowPricingModal(true);
-        }}
+        onOpenPricing={() => setShowPricingModal(true)}
       />
     </div>
   );
