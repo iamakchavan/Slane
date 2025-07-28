@@ -21,12 +21,13 @@ import {
 } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
 import { Checkbox } from "../../components/ui/checkbox";
-import { Input } from "../../components/ui/input";
-import { Badge } from "../../components/ui/badge";
 
 import { LinearTaskModal } from "../../components/LinearTaskModal";
 import { PricingModal } from "../../components/PricingModal";
 import { SettingsModal } from "../../components/SettingsModal";
+import { CommandPalette } from "../../components/CommandPalette";
+import { useTheme } from "../../contexts/ThemeContext";
+import { getPriorityColors } from "../../lib/theme-utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,12 +44,18 @@ interface Task {
 }
 
 export const Tasks = (): JSX.Element => {
+  const { theme } = useTheme();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
 
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+
+  // Priority animation states
+  const [changingPriorities, setChangingPriorities] = useState<Set<string>>(new Set());
+  const [transitioningPriorities, setTransitioningPriorities] = useState<Set<string>>(new Set());
 
   // Task data for the main content with proper state management
   const [tasks, setTasks] = useState<Task[]>([
@@ -82,17 +89,8 @@ export const Tasks = (): JSX.Element => {
     },
   ]);
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-50 text-red-600 border-red-100";
-      case "medium":
-        return "bg-amber-50 text-amber-600 border-amber-100";
-      case "low":
-        return "bg-emerald-50 text-emerald-600 border-emerald-100";
-      default:
-        return "bg-gray-50 text-gray-600 border-gray-100";
-    }
+  const getPriorityColor = (priority: "high" | "medium" | "low") => {
+    return getPriorityColors(priority, theme);
   };
 
   // Sidebar filter state
@@ -194,9 +192,53 @@ export const Tasks = (): JSX.Element => {
     setExpandedTasks(newExpanded);
   };
 
-  // Keyboard shortcut for opening new task modal
+  const cyclePriority = (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    // Add to changing priorities set
+    setChangingPriorities(prev => new Set(prev).add(taskId));
+    setTransitioningPriorities(prev => new Set(prev).add(taskId));
+
+    const priorities: Array<'low' | 'medium' | 'high'> = ['low', 'medium', 'high'];
+    const currentIndex = priorities.indexOf(task.priority);
+    const nextIndex = (currentIndex + 1) % priorities.length;
+    const nextPriority = priorities[nextIndex];
+
+    // Smooth transition with blur effect (same timing as modal)
+    setTimeout(() => {
+      // Update the task priority
+      setTasks(tasks.map(t =>
+        t.id === taskId ? { ...t, priority: nextPriority } : t
+      ));
+    }, 100);
+
+    setTimeout(() => {
+      // Remove from transitioning set
+      setTransitioningPriorities(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(taskId);
+        return newSet;
+      });
+      setChangingPriorities(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(taskId);
+        return newSet;
+      });
+    }, 200);
+  };
+
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Command Palette shortcut (Ctrl+K or Cmd+K)
+      if (event.key.toLowerCase() === 'k' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        event.stopPropagation();
+        setCommandPaletteOpen(true);
+        return;
+      }
+
       // Check if T key is pressed (case insensitive)
       if (event.key.toLowerCase() === 't') {
         // Check if any modifier keys are pressed
@@ -230,7 +272,7 @@ export const Tasks = (): JSX.Element => {
   }, []);
 
   return (
-    <div className="bg-gray-50/30 flex w-full min-h-screen">
+    <div className="bg-gray-50/30 dark:bg-[#161618] flex w-full min-h-screen">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
@@ -242,7 +284,7 @@ export const Tasks = (): JSX.Element => {
       {/* Sidebar */}
       <aside className={`
         fixed inset-y-0 left-0 z-50
-        flex flex-col min-h-screen bg-white border-r border-gray-200/60
+        flex flex-col min-h-screen bg-white dark:bg-[#1c1c1e] border-r border-gray-200/60 dark:border-[#3a3a3c]
         transition-all duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         w-72
@@ -257,17 +299,17 @@ export const Tasks = (): JSX.Element => {
                   <Button variant="ghost" className="p-0 h-auto hover:bg-transparent group">
                     <div className="flex items-center gap-3">
                       <img src="/Slane.png" alt="Slane" className="w-6 h-6 rounded-sm shadow-sm" />
-                      <span className="font-normal text-sm text-gray-900">Slane</span>
-                      <ChevronDownIcon className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      <span className="font-normal text-sm text-gray-900 dark:text-white">Slane</span>
+                      <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6] group-hover:text-gray-600 dark:group-hover:text-white transition-colors" />
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48 shadow-sm border-gray-200/60 rounded-sm">
+                <DropdownMenuContent align="start" className="w-48 shadow-sm border-gray-200/60 dark:border-[#3a3a3c] rounded-sm bg-white dark:bg-[#2c2c2e]">
                   <DropdownMenuItem className="text-sm flex items-center gap-3">
                     <Building2 className="w-4 h-4 text-gray-500" />
                     Switch workspace
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     className="text-sm flex items-center gap-3"
                     onClick={() => setShowSettingsModal(true)}
                   >
@@ -289,11 +331,18 @@ export const Tasks = (): JSX.Element => {
 
           {/* Search Bar */}
           <div className="relative mb-6">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              placeholder="Search"
-              className="pl-10 border-gray-200/60 bg-gray-50/50 focus:border-gray-300 focus:ring-1 focus:ring-gray-300/50 text-sm h-9 rounded-sm transition-all"
-            />
+            <button
+              onClick={() => setCommandPaletteOpen(true)}
+              className="w-full flex items-center px-3 py-2 border border-gray-200/60 dark:border-[#3a3a3c] bg-gray-50/50 dark:bg-[#2c2c2e] hover:bg-gray-100/50 dark:hover:bg-[#3a3a3c] focus:border-gray-300 dark:focus:border-[#48484a] focus:ring-1 focus:ring-gray-300/50 dark:focus:ring-[#48484a]/50 text-sm h-9 rounded-sm transition-all text-left"
+            >
+              <SearchIcon className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6] mr-3" />
+              <span className="text-gray-400 dark:text-[#a1a1a6]">Search</span>
+              <div className="ml-auto">
+                <kbd className="px-1.5 py-0.5 text-xs bg-white dark:bg-[#1c1c1e] text-gray-500 dark:text-[#a1a1a6] border border-gray-200 dark:border-[#3a3a3c] rounded">
+                  ⌘K
+                </kbd>
+              </div>
+            </button>
           </div>
 
           {/* Main Content Area - Flex 1 to push user profile to bottom */}
@@ -302,8 +351,8 @@ export const Tasks = (): JSX.Element => {
               <div className="space-y-3 mb-6">
                 {/* Tasks Header */}
                 <div className="flex items-center justify-between">
-                  <span className="font-normal text-sm text-gray-900">Filters</span>
-                  <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+                  <span className="font-normal text-sm text-gray-900 dark:text-white">Filters</span>
+                  <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6]" />
                 </div>
 
                 {/* Task List */}
@@ -312,13 +361,13 @@ export const Tasks = (): JSX.Element => {
                     <div
                       key={item.id}
                       onClick={() => setActiveFilter(item.id)}
-                      className={`flex items-center justify-between p-2.5 rounded-sm text-sm transition-all hover:bg-gray-100/40 cursor-pointer ${item.selected ? "bg-gray-100/80" : ""
+                      className={`flex items-center justify-between p-2.5 rounded-sm text-sm transition-all hover:bg-gray-100/40 dark:hover:bg-[#2c2c2e] cursor-pointer ${item.selected ? "bg-gray-100/80 dark:bg-[#2c2c2e]" : ""
                         }`}
                     >
-                      <span className="text-gray-700 truncate text-sm font-normal">
+                      <span className="text-gray-700 dark:text-[#a1a1a6] truncate text-sm font-normal">
                         {item.name}
                       </span>
-                      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-sm">
+                      <span className="text-xs text-gray-400 dark:text-[#6d6d70] bg-gray-100 dark:bg-[#2c2c2e] px-2 py-0.5 rounded-sm">
                         {item.count}
                       </span>
                     </div>
@@ -328,25 +377,25 @@ export const Tasks = (): JSX.Element => {
             </div>
 
             {/* User Profile - Positioned at bottom */}
-            <div className="border-t border-gray-200/60 pt-4 mt-auto pb-4">
+            <div className="border-t border-gray-200/60 dark:border-[#3a3a3c] pt-4 mt-auto pb-4">
               {!showAccountUI ? (
                 <div
-                  className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-gray-100/40 cursor-pointer transition-colors"
+                  className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-gray-100/40 dark:hover:bg-[#2c2c2e] cursor-pointer transition-colors"
                   onClick={() => setShowAccountUI(true)}
                 >
                   <Avatar className="w-8 h-8 shadow-sm">
                     <AvatarImage src="/inbox-2.png" alt="User avatar" />
-                    <AvatarFallback className="text-xs bg-gray-100 text-gray-600 font-normal">BC</AvatarFallback>
+                    <AvatarFallback className="text-xs bg-gray-100 dark:bg-[#3a3a3c] text-gray-600 dark:text-[#a1a1a6] font-normal">BC</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-normal truncate text-gray-900">
+                    <p className="text-sm font-normal truncate text-gray-900 dark:text-white">
                       Bittu Creators
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6]">
                       Free Plan
                     </p>
                   </div>
-                  <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+                  <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6]" />
                 </div>
               ) : (
                 isAccountPanelVisible && (
@@ -368,45 +417,45 @@ export const Tasks = (): JSX.Element => {
                     <div className="space-y-4">
                       {/* Account Header */}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-900">Account</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">Account</span>
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => setShowAccountUI(false)}
-                          className="w-6 h-6 hover:bg-gray-100/60 rounded-sm"
+                          className="w-6 h-6 hover:bg-gray-100/60 dark:hover:bg-[#3a3a3c] rounded-sm"
                         >
-                          <X className="w-3 h-3 text-gray-400" />
+                          <X className="w-3 h-3 text-gray-400 dark:text-[#a1a1a6]" />
                         </Button>
                       </div>
 
                       {/* Profile Section */}
                       <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-2.5 bg-gray-50/50 rounded-sm">
+                        <div className="flex items-center gap-3 p-2.5 bg-gray-50/50 dark:bg-[#2c2c2e] rounded-sm">
                           <Avatar className="w-10 h-10 shadow-sm">
                             <AvatarImage src="/inbox-2.png" alt="User avatar" />
-                            <AvatarFallback className="text-sm bg-gray-100 text-gray-600 font-normal">BC</AvatarFallback>
+                            <AvatarFallback className="text-sm bg-gray-100 dark:bg-[#3a3a3c] text-gray-600 dark:text-[#a1a1a6] font-normal">BC</AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
                               Bittu Creators
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-[#a1a1a6]">
                               bittucreators@gmail.com
                             </p>
                           </div>
                         </div>
 
                         {/* Plan Info */}
-                        <div className="p-2.5 bg-blue-50/50 rounded-sm border border-blue-100/50">
+                        <div className="p-2.5 bg-blue-50/50 dark:bg-blue-900/20 rounded-sm border border-blue-100/50 dark:border-blue-800/30">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-xs font-medium text-blue-900">Free Plan</p>
-                              <p className="text-xs text-blue-600">Basic features</p>
+                              <p className="text-xs font-medium text-blue-900 dark:text-blue-400">Free Plan</p>
+                              <p className="text-xs text-blue-600 dark:text-blue-400">Basic features</p>
                             </div>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-xs h-7 px-3 border-blue-200 text-blue-700 hover:bg-blue-50"
+                              className="text-xs h-7 px-3 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-800/30"
                               onClick={() => setShowPricingModal(true)}
                             >
                               Upgrade
@@ -416,21 +465,21 @@ export const Tasks = (): JSX.Element => {
 
                         {/* Account Actions */}
                         <div className="space-y-1">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setShowSettingsModal(true)}
-                            className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm flex items-center gap-3"
+                            className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 dark:hover:bg-[#3a3a3c] rounded-sm flex items-center gap-3 text-gray-700 dark:text-[#a1a1a6]"
                           >
-                            <Settings className="w-4 h-4 text-gray-500" />
+                            <Settings className="w-4 h-4 text-gray-500 dark:text-[#a1a1a6]" />
                             Settings
                           </Button>
-                          <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm flex items-center gap-3">
-                            <LifeBuoy className="w-4 h-4 text-gray-500" />
+                          <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 dark:hover:bg-[#3a3a3c] rounded-sm flex items-center gap-3 text-gray-700 dark:text-[#a1a1a6]">
+                            <LifeBuoy className="w-4 h-4 text-gray-500 dark:text-[#a1a1a6]" />
                             Help & Support
                           </Button>
-                          <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 rounded-sm text-red-600 hover:text-red-700 hover:bg-red-50/50 flex items-center gap-3">
-                            <LogOut className="w-4 h-4 text-red-500" />
+                          <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 dark:hover:bg-red-900/20 rounded-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50/50 dark:hover:bg-red-900/30 flex items-center gap-3">
+                            <LogOut className="w-4 h-4 text-red-500 dark:text-red-400" />
                             Sign Out
                           </Button>
                         </div>
@@ -445,21 +494,21 @@ export const Tasks = (): JSX.Element => {
       </aside>
 
       {/* Main Content */}
-      <main className={`flex-1 flex flex-col bg-white min-w-0 transition-all duration-300 ease-in-out h-screen ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-0'}`}>
+      <main className={`flex-1 flex flex-col bg-white dark:bg-[#161618] min-w-0 transition-all duration-300 ease-in-out h-screen ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-0'}`}>
         {/* Sticky Header */}
-        <header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-gray-200/60 bg-white">
+        <header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-gray-200/60 dark:border-[#3a3a3c] bg-white dark:bg-[#1c1c1e]">
           <div className="flex items-center gap-3">
             {/* Sidebar Toggle Button */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="w-8 h-8 hover:bg-gray-100/60 rounded-sm transition-colors"
+              className="w-8 h-8 hover:bg-gray-100/60 dark:hover:bg-[#2c2c2e] rounded-sm transition-colors"
             >
-              <PanelLeftIcon className="w-4 h-4 text-gray-600" />
+              <PanelLeftIcon className="w-4 h-4 text-gray-600 dark:text-[#a1a1a6]" />
             </Button>
-            <h1 className="text-xl font-normal text-gray-900">Tasks</h1>
-            <span className="text-xs text-gray-400 ml-2">Press T to create task</span>
+            <h1 className="text-xl font-normal text-gray-900 dark:text-white">Tasks</h1>
+            <span className="text-xs text-gray-400 dark:text-[#6d6d70] ml-2">Press T to create task</span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -468,69 +517,78 @@ export const Tasks = (): JSX.Element => {
               variant="outline"
               size="sm"
               onClick={() => setNewTaskModalOpen(true)}
-              className="gap-2 border-gray-200/60 hover:bg-gray-50/60 text-sm font-normal rounded-sm h-9 px-4 shadow-none hover:shadow-none transition-all"
+              className="gap-2 border-gray-200/60 dark:border-[#3a3a3c] hover:bg-gray-50/60 dark:hover:bg-[#2c2c2e] text-sm font-normal rounded-sm h-9 px-4 shadow-none hover:shadow-none transition-all text-gray-900 dark:text-white"
             >
               <PlusIcon className="w-4 h-4" />
               <span className="hidden sm:inline">New task</span>
-              <span className="hidden lg:inline text-xs text-gray-400 ml-1">(T)</span>
+              <span className="hidden lg:inline text-xs text-gray-400 dark:text-[#6d6d70] ml-1">(T)</span>
             </Button>
           </div>
         </header>
 
         {/* Scrollable Task Content */}
-        <div className="flex-1 overflow-y-auto scrollbar-minimal p-6 bg-gray-50/30">
-          <div className="border border-gray-200/60 rounded-sm bg-white shadow-sm hover:shadow-sm transition-shadow">
+        <div className="flex-1 overflow-y-auto scrollbar-minimal p-6 bg-gray-50/30 dark:bg-[#161618]">
+          <div className="border border-gray-200/60 dark:border-[#3a3a3c] rounded-sm bg-white dark:bg-[#1c1c1e] shadow-sm hover:shadow-sm transition-shadow">
             {/* Sticky Desktop Table Header */}
-            <div className="hidden md:flex items-center gap-4 p-4 border-b border-gray-200/60 bg-gray-50/20 sticky top-0 z-10">
-              <Checkbox className="border-gray-300/80 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900" />
+            <div className="hidden md:flex items-center gap-4 p-4 border-b border-gray-200/60 dark:border-[#3a3a3c] bg-gray-50/20 dark:bg-[#2c2c2e]/20 sticky top-0 z-10">
+              <Checkbox className="border-gray-300/80 dark:border-[#6d6d70] data-[state=checked]:bg-gray-900 dark:data-[state=checked]:bg-white data-[state=checked]:border-gray-900 dark:data-[state=checked]:border-white" />
               <div className="flex-1">
-                <span className="font-normal text-sm text-gray-600">Name</span>
+                <span className="font-normal text-sm text-gray-600 dark:text-[#a1a1a6]">Name</span>
               </div>
               <div className="w-24">
-                <span className="font-normal text-sm text-gray-600">Priority</span>
+                <span className="font-normal text-sm text-gray-600 dark:text-[#a1a1a6]">Priority</span>
               </div>
               <div className="w-10" />
             </div>
 
             {/* Scrollable Task Rows */}
-            <div className="divide-y divide-gray-200/40 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-minimal">
+            <div className="divide-y divide-gray-200/40 dark:divide-[#3a3a3c]/40 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-minimal">
               {filteredTasks.map((task) => (
-                <div key={task.id} className="group hover:bg-gray-50/30 transition-colors">
+                <div key={task.id} className="group hover:bg-gray-50/30 dark:hover:bg-[#2c2c2e]/30 transition-colors">
                   {/* Desktop Layout */}
                   <div className="hidden md:flex items-center gap-4 p-4">
                     <Checkbox
                       checked={task.completed}
                       onCheckedChange={() => toggleTask(task.id)}
-                      className="border-gray-300/80 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900"
+                      className="border-gray-300/80 dark:border-[#6d6d70] data-[state=checked]:bg-gray-900 dark:data-[state=checked]:bg-white data-[state=checked]:border-gray-900 dark:data-[state=checked]:border-white"
                     />
                     <div className="flex-1 min-w-0">
                       <div
                         className={`text-sm leading-6 cursor-pointer ${task.completed
-                          ? "text-gray-500 line-through"
-                          : "text-gray-900"
+                          ? "text-gray-500 dark:text-[#6d6d70] line-through"
+                          : "text-gray-900 dark:text-white"
                           }`}
                         onClick={() => task.description && toggleTaskExpansion(task.id)}
                       >
                         {task.name}
                         {task.description && (
-                          <span className="ml-2 text-xs text-gray-400">
+                          <span className="ml-2 text-xs text-gray-400 dark:text-[#6d6d70]">
                             {expandedTasks.has(task.id) ? '▼' : '▶'}
                           </span>
                         )}
                       </div>
                       {task.description && expandedTasks.has(task.id) && (
-                        <div className="mt-2 text-xs text-gray-600 leading-relaxed">
+                        <div className="mt-2 text-xs text-gray-600 dark:text-[#a1a1a6] leading-relaxed">
                           {task.description}
                         </div>
                       )}
                     </div>
                     <div className="w-24">
-                      <Badge
-                        variant="outline"
-                        className={`text-xs font-normal px-2 py-0.5 rounded-sm border ${getPriorityColor(task.priority)}`}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          cyclePriority(task.id);
+                        }}
+                        className={`text-xs font-normal px-2 py-0.5 rounded-sm border transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${getPriorityColor(task.priority)} ${changingPriorities.has(task.id) ? 'animate-pulse' : ''
+                          }`}
                       >
-                        {task.priority}
-                      </Badge>
+                        <span className={`transition-all duration-200 ease-out transform ${transitioningPriorities.has(task.id)
+                          ? 'blur-sm scale-95 opacity-70'
+                          : 'blur-0 scale-100 opacity-100'
+                          }`}>
+                          {task.priority}
+                        </span>
+                      </button>
                     </div>
                     <div className="w-10">
                       <DropdownMenu>
@@ -538,9 +596,9 @@ export const Tasks = (): JSX.Element => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="w-8 h-8 hover:bg-gray-100/60 opacity-0 group-hover:opacity-100 transition-all rounded-sm"
+                            className="w-8 h-8 hover:bg-gray-100/60 dark:hover:bg-[#2c2c2e] opacity-0 group-hover:opacity-100 transition-all rounded-sm"
                           >
-                            <MoreHorizontalIcon className="w-4 h-4 text-gray-400" />
+                            <MoreHorizontalIcon className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6]" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="shadow-sm border-gray-200/60 rounded-sm">
@@ -581,13 +639,13 @@ export const Tasks = (): JSX.Element => {
                       <Checkbox
                         checked={task.completed}
                         onCheckedChange={() => toggleTask(task.id)}
-                        className="border-gray-300/80 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900 mt-0.5"
+                        className="border-gray-300/80 dark:border-[#6d6d70] data-[state=checked]:bg-gray-900 dark:data-[state=checked]:bg-white data-[state=checked]:border-gray-900 dark:data-[state=checked]:border-white mt-0.5"
                       />
                       <div className="flex-1 min-w-0">
                         <div
                           className={`text-sm leading-6 cursor-pointer ${task.completed
-                            ? "text-gray-500 line-through"
-                            : "text-gray-900"
+                            ? "text-gray-500 dark:text-[#6d6d70] line-through"
+                            : "text-gray-900 dark:text-white"
                             }`}
                           onClick={() => task.description && toggleTaskExpansion(task.id)}
                         >
@@ -599,7 +657,7 @@ export const Tasks = (): JSX.Element => {
                           )}
                         </div>
                         {task.description && expandedTasks.has(task.id) && (
-                          <div className="mt-2 text-xs text-gray-600 leading-relaxed">
+                          <div className="mt-2 text-xs text-gray-600 dark:text-[#a1a1a6] leading-relaxed">
                             {task.description}
                           </div>
                         )}
@@ -609,9 +667,9 @@ export const Tasks = (): JSX.Element => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="w-8 h-8 hover:bg-gray-100/60 -mr-2 rounded-sm"
+                            className="w-8 h-8 hover:bg-gray-100/60 dark:hover:bg-[#2c2c2e] -mr-2 rounded-sm"
                           >
-                            <MoreHorizontalIcon className="w-4 h-4 text-gray-400" />
+                            <MoreHorizontalIcon className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6]" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="shadow-sm border-gray-200/60 rounded-sm">
@@ -645,12 +703,21 @@ export const Tasks = (): JSX.Element => {
                       </DropdownMenu>
                     </div>
                     <div className="flex items-center justify-between pl-7">
-                      <Badge
-                        variant="outline"
-                        className={`text-xs font-normal px-2 py-0.5 rounded-sm border ${getPriorityColor(task.priority)}`}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          cyclePriority(task.id);
+                        }}
+                        className={`text-xs font-normal px-2 py-0.5 rounded-sm border transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${getPriorityColor(task.priority)} ${changingPriorities.has(task.id) ? 'animate-pulse' : ''
+                          }`}
                       >
-                        {task.priority}
-                      </Badge>
+                        <span className={`transition-all duration-200 ease-out transform ${transitioningPriorities.has(task.id)
+                          ? 'blur-sm scale-95 opacity-70'
+                          : 'blur-0 scale-100 opacity-100'
+                          }`}>
+                          {task.priority}
+                        </span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -678,6 +745,20 @@ export const Tasks = (): JSX.Element => {
         isOpen={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
         onOpenPricing={() => setShowPricingModal(true)}
+      />
+
+      {/* Command Palette */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        onOpenSettings={() => {
+          setCommandPaletteOpen(false);
+          setShowSettingsModal(true);
+        }}
+        onCreateTask={() => {
+          setCommandPaletteOpen(false);
+          setNewTaskModalOpen(true);
+        }}
       />
     </div>
   );

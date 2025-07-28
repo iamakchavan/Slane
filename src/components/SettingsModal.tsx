@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, RotateCcw, Upload } from 'lucide-react';
+import { X, RotateCcw, Upload, User, Palette, Settings as SettingsIcon } from 'lucide-react';
 import { Button } from './ui/button';
+import { useTheme } from '../contexts/ThemeContext';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
   Select,
@@ -21,9 +22,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   onOpenPricing,
 }) => {
+  const { theme, toggleTheme } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
-  const [theme, setTheme] = useState('system');
+  const [localTheme, setLocalTheme] = useState('system');
   const [language, setLanguage] = useState('english');
   const [accentColor, setAccentColor] = useState('blue');
   const [transparentSidebar, setTransparentSidebar] = useState(false);
@@ -54,16 +56,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleResetDefaults = () => {
-    setTheme('system');
+    setLocalTheme('system');
     setLanguage('english');
     setAccentColor('blue');
     setTransparentSidebar(false);
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile' },
-    { id: 'appearance', label: 'Appearance' },
-    { id: 'account', label: 'Account' },
+    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'appearance', label: 'Appearance', icon: Palette },
+    { id: 'account', label: 'Account', icon: SettingsIcon },
   ];
 
   const themes = [
@@ -83,7 +85,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-300 ease-out ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ease-out ${
         isVisible ? 'bg-black/20 backdrop-blur-sm' : 'bg-black/0'
       }`}
       onClick={(e) => {
@@ -93,123 +95,192 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       }}
     >
       <div 
-        className={`bg-white text-gray-900 rounded-sm shadow-2xl w-full max-w-2xl mx-2 sm:mx-4 flex flex-col border border-gray-100 transition-all duration-300 ease-out transform max-h-[90vh] ${
+        className={`bg-white dark:bg-[#2c2c2e] text-gray-900 dark:text-white w-full max-w-md sm:max-w-2xl mx-auto flex flex-col border border-gray-200 dark:border-[#3a3a3c] transition-all duration-300 ease-out transform max-h-[90vh] shadow-2xl ${
           isVisible 
             ? 'scale-100 opacity-100 translate-y-0' 
             : 'scale-95 opacity-0 translate-y-4'
         }`}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
-          <h2 className="text-base sm:text-lg font-medium text-gray-900">Settings</h2>
+        {/* Sharp Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-[#3a3a3c]">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Settings</h2>
+            <p className="text-sm text-gray-500 dark:text-[#a1a1a6] mt-0.5">Manage your preferences</p>
+          </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 h-8 w-8 rounded-sm transition-colors"
+            className="text-gray-400 dark:text-[#a1a1a6] hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] h-9 w-9 transition-colors"
           >
             <X className="w-4 h-4" />
           </Button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-gray-100 overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium transition-colors relative whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'text-gray-900 border-b-2 border-gray-900'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Ultra Minimal Tab Navigation */}
+        <div className="px-6 border-b border-gray-200 dark:border-[#3a3a3c]">
+          <div className="flex">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-3 text-sm font-medium transition-colors relative ${
+                  activeTab === tab.id
+                    ? 'text-gray-900 dark:text-white'
+                    : 'text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white'
+                }`}
+              >
+                {tab.label}
+                {activeTab === tab.id && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 dark:bg-white"></div>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-4 sm:p-6 max-h-96 overflow-y-auto scrollbar-minimal">
+        <div className="flex-1 px-6 py-6 overflow-y-auto max-h-96 scrollbar-minimal">
+          {activeTab === 'profile' && (
+            <div className="space-y-6">
+              {/* Profile Header */}
+              <div className="text-center sm:text-left sm:flex sm:items-center sm:space-x-6">
+                <div className="relative inline-block">
+                  <Avatar className="w-20 h-20 mx-auto sm:mx-0 shadow-lg">
+                    <AvatarImage src="/inbox-2.png" alt="Profile" />
+                    <AvatarFallback className="text-xl bg-gray-900 text-white font-medium">BC</AvatarFallback>
+                  </Avatar>
+                  <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-gray-900 text-white flex items-center justify-center hover:bg-gray-800 transition-colors shadow-lg">
+                    <Upload className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="mt-4 sm:mt-0">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Bittu Creators</h3>
+                  <p className="text-sm text-gray-500 dark:text-[#a1a1a6]">bittucreators@gmail.com</p>
+                </div>
+              </div>
+
+              {/* Form Fields */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                    Display Name
+                  </label>
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="w-full px-3 py-2.5 border border-gray-200 dark:border-[#3a3a3c] text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent transition-all bg-gray-50 dark:bg-[#1c1c1e] focus:bg-white dark:focus:bg-[#2c2c2e] placeholder-gray-400 dark:placeholder-[#6d6d70]"
+                    placeholder="Enter your display name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2.5 border border-gray-200 dark:border-[#3a3a3c] text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent transition-all bg-gray-50 dark:bg-[#1c1c1e] focus:bg-white dark:focus:bg-[#2c2c2e] placeholder-gray-400 dark:placeholder-[#6d6d70]"
+                    placeholder="Enter your email"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                    Timezone
+                  </label>
+                  <Select value={timezone} onValueChange={setTimezone}>
+                    <SelectTrigger className="w-full px-3 py-2.5 border border-gray-200 dark:border-[#3a3a3c] text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent bg-gray-50 dark:bg-[#1c1c1e]">
+                      <SelectValue placeholder="Select your timezone" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-[#2c2c2e] border-gray-200 dark:border-[#3a3a3c]">
+                      <SelectItem value="utc" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] focus:bg-gray-100 dark:focus:bg-[#3a3a3c]">UTC (Coordinated Universal Time)</SelectItem>
+                      <SelectItem value="est" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] focus:bg-gray-100 dark:focus:bg-[#3a3a3c]">EST (Eastern Standard Time)</SelectItem>
+                      <SelectItem value="pst" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] focus:bg-gray-100 dark:focus:bg-[#3a3a3c]">PST (Pacific Standard Time)</SelectItem>
+                      <SelectItem value="gmt" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] focus:bg-gray-100 dark:focus:bg-[#3a3a3c]">GMT (Greenwich Mean Time)</SelectItem>
+                      <SelectItem value="ist" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] focus:bg-gray-100 dark:focus:bg-[#3a3a3c]">IST (India Standard Time)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'appearance' && (
             <div className="space-y-6">
               {/* Language */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Language
-                </label>
-                <p className="text-xs text-gray-500 mb-3">
-                  Select the language of the platform
-                </p>
-                <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger className="w-full border-gray-200 rounded-sm text-sm focus:ring-1 focus:ring-gray-300 focus:border-gray-300">
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="english">English</SelectItem>
-                    <SelectItem value="spanish">Spanish</SelectItem>
-                    <SelectItem value="french">French</SelectItem>
-                    <SelectItem value="german">German</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                    Language
+                  </label>
+                  <Select value={language} onValueChange={setLanguage}>
+                    <SelectTrigger className="w-full px-3 py-2.5 border border-gray-200 dark:border-[#3a3a3c] text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent bg-gray-50 dark:bg-[#1c1c1e]">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-[#2c2c2e] border-gray-200 dark:border-[#3a3a3c]">
+                      <SelectItem value="english" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] focus:bg-gray-100 dark:focus:bg-[#3a3a3c]">English</SelectItem>
+                      <SelectItem value="spanish" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] focus:bg-gray-100 dark:focus:bg-[#3a3a3c]">Spanish</SelectItem>
+                      <SelectItem value="french" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] focus:bg-gray-100 dark:focus:bg-[#3a3a3c]">French</SelectItem>
+                      <SelectItem value="german" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] focus:bg-gray-100 dark:focus:bg-[#3a3a3c]">German</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div></div>
               </div>
 
               {/* Interface Theme */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Interface theme
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-3">
+                  Interface Theme
                 </label>
-                <p className="text-xs text-gray-500 mb-3">
-                  Customize your application theme
+                <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mb-3">
+                  Choose between light and dark mode
                 </p>
-                <div className="grid grid-cols-3 gap-3">
-                  {themes.map((themeOption) => (
-                    <button
-                      key={themeOption.id}
-                      onClick={() => setTheme(themeOption.id)}
-                      className={`relative p-3 rounded-sm border-2 transition-all ${
-                        theme === themeOption.id
-                          ? 'border-gray-900'
-                          : 'border-gray-200 hover:border-gray-300'
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c] rounded-sm">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                      Dark Mode
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
+                      Switch between light and dark themes
+                    </p>
+                  </div>
+                  <button
+                    onClick={toggleTheme}
+                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${
+                      theme === 'dark' ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${
+                        theme === 'dark' ? 'translate-x-5' : 'translate-x-1'
                       }`}
-                    >
-                      <div className={`w-full h-16 rounded-sm mb-2 ${themeOption.preview}`}>
-                        <div className="p-2 space-y-1">
-                          <div className="w-8 h-1 bg-gray-400 rounded"></div>
-                          <div className="w-12 h-1 bg-gray-300 rounded"></div>
-                          <div className="w-6 h-1 bg-gray-300 rounded"></div>
-                        </div>
-                      </div>
-                      <span className="text-xs font-medium text-gray-700">
-                        {themeOption.label}
-                      </span>
-                      {theme === themeOption.id && (
-                        <div className="absolute top-1 right-1 w-4 h-4 bg-gray-900 rounded-full flex items-center justify-center">
-                          <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                        </div>
-                      )}
-                    </button>
-                  ))}
+                    />
+                  </button>
                 </div>
               </div>
 
               {/* Accent Color */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Accent color
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  Accent Color
                 </label>
-                <p className="text-xs text-gray-500 mb-3">
+                <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mb-3">
                   Select your application accent color
                 </p>
-                <div className="flex space-x-3">
+                <div className="flex space-x-4">
                   {accentColors.map((color) => (
                     <button
                       key={color.id}
                       onClick={() => setAccentColor(color.id)}
-                      className={`w-8 h-8 rounded-full ${color.color} transition-all ${
+                      className={`w-10 h-10 ${color.color} transition-all ${
                         accentColor === color.id
-                          ? 'ring-2 ring-offset-2 ring-gray-400'
-                          : 'hover:scale-110'
+                          ? 'ring-2 ring-offset-2 ring-gray-400 scale-110'
+                          : 'hover:scale-105'
                       }`}
                     />
                   ))}
@@ -217,264 +288,186 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {/* Transparent Sidebar */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">
                 <div>
-                  <label className="block text-sm font-medium text-gray-900">
-                    Transparent sidebar
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                    Transparent Sidebar
                   </label>
-                  <p className="text-xs text-gray-500">
-                    Add a transparency layer to your sidebar
+                  <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
+                    Add transparency layer to your sidebar
                   </p>
                 </div>
                 <button
                   onClick={() => setTransparentSidebar(!transparentSidebar)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    transparentSidebar ? 'bg-gray-900' : 'bg-gray-200'
+                  className={`relative inline-flex h-5 w-9 items-center transition-colors ${
+                    transparentSidebar ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
                   }`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      transparentSidebar ? 'translate-x-6' : 'translate-x-1'
+                    className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${
+                      transparentSidebar ? 'translate-x-5' : 'translate-x-1'
                     }`}
                   />
                 </button>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'profile' && (
-            <div className="space-y-6">
-              {/* Profile Picture */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Profile Picture
-                </label>
-                <p className="text-xs text-gray-500 mb-3">
-                  Upload a profile picture to personalize your account
-                </p>
-                <div className="flex items-center gap-4">
-                  <Avatar className="w-16 h-16">
-                    <AvatarImage src="/inbox-2.png" alt="Profile" />
-                    <AvatarFallback className="text-lg bg-gray-100 text-gray-600">BC</AvatarFallback>
-                  </Avatar>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-2 border-gray-200 text-gray-700 hover:bg-gray-50"
-                  >
-                    <Upload className="w-4 h-4" />
-                    Upload new
-                  </Button>
-                </div>
-              </div>
-
-              {/* Display Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Display Name
-                </label>
-                <p className="text-xs text-gray-500 mb-3">
-                  This is how your name will appear in the application
-                </p>
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Email Address
-                </label>
-                <p className="text-xs text-gray-500 mb-3">
-                  Your email address for account notifications
-                </p>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
-                />
-              </div>
-
-              {/* Timezone */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Timezone
-                </label>
-                <p className="text-xs text-gray-500 mb-3">
-                  Select your timezone for accurate task scheduling
-                </p>
-                <Select value={timezone} onValueChange={setTimezone}>
-                  <SelectTrigger className="w-full border-gray-200 rounded-sm text-sm focus:ring-1 focus:ring-gray-300 focus:border-gray-300">
-                    <SelectValue placeholder="Select timezone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="utc">UTC (Coordinated Universal Time)</SelectItem>
-                    <SelectItem value="est">EST (Eastern Standard Time)</SelectItem>
-                    <SelectItem value="pst">PST (Pacific Standard Time)</SelectItem>
-                    <SelectItem value="gmt">GMT (Greenwich Mean Time)</SelectItem>
-                    <SelectItem value="ist">IST (India Standard Time)</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
           )}
 
           {activeTab === 'account' && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Account Plan */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Current Plan
-                </label>
-                <div className="p-4 bg-blue-50/50 rounded-sm border border-blue-100/50">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-blue-900">Free Plan</p>
-                      <p className="text-xs text-blue-600">Basic features with limited storage</p>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={onOpenPricing}
-                      className="text-xs h-8 px-3 border-blue-200 text-blue-700 hover:bg-blue-50"
-                    >
-                      Upgrade
-                    </Button>
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-blue-900 dark:text-blue-400">Free Plan</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">Basic features with limited storage</p>
                   </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={onOpenPricing}
+                    className="text-xs h-7 px-3 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/30"
+                  >
+                    Upgrade
+                  </Button>
                 </div>
               </div>
 
-              {/* Email Notifications */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-900">
-                    Email Notifications
-                  </label>
-                  <p className="text-xs text-gray-500">
-                    Receive email updates about your tasks and account
-                  </p>
-                </div>
-                <button
-                  onClick={() => setEmailNotifications(!emailNotifications)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    emailNotifications ? 'bg-gray-900' : 'bg-gray-200'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      emailNotifications ? 'translate-x-6' : 'translate-x-1'
+              {/* Settings */}
+              <div className="space-y-3">
+                {/* Email Notifications */}
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                      Email Notifications
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
+                      Receive updates about tasks
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setEmailNotifications(!emailNotifications)}
+                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${
+                      emailNotifications ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
                     }`}
-                  />
-                </button>
-              </div>
+                  >
+                    <span
+                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${
+                        emailNotifications ? 'translate-x-5' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
 
-              {/* Auto Save */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-900">
-                    Auto Save
-                  </label>
-                  <p className="text-xs text-gray-500">
-                    Automatically save your work as you type
-                  </p>
-                </div>
-                <button
-                  onClick={() => setAutoSave(!autoSave)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    autoSave ? 'bg-gray-900' : 'bg-gray-200'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      autoSave ? 'translate-x-6' : 'translate-x-1'
+                {/* Auto Save */}
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                      Auto Save
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
+                      Save work automatically
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setAutoSave(!autoSave)}
+                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${
+                      autoSave ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
                     }`}
-                  />
-                </button>
-              </div>
+                  >
+                    <span
+                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${
+                        autoSave ? 'translate-x-5' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
 
-              {/* Task Reminders */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-900">
-                    Task Reminders
-                  </label>
-                  <p className="text-xs text-gray-500">
-                    Get reminded about upcoming task deadlines
-                  </p>
-                </div>
-                <button
-                  onClick={() => setTaskReminders(!taskReminders)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    taskReminders ? 'bg-gray-900' : 'bg-gray-200'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      taskReminders ? 'translate-x-6' : 'translate-x-1'
+                {/* Task Reminders */}
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                      Task Reminders
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
+                      Get reminded about deadlines
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setTaskReminders(!taskReminders)}
+                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${
+                      taskReminders ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
                     }`}
-                  />
-                </button>
+                  >
+                    <span
+                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${
+                        taskReminders ? 'translate-x-5' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
 
               {/* Danger Zone */}
-              <div className="pt-4 border-t border-gray-200">
-                <label className="block text-sm font-medium text-red-600 mb-2">
-                  Danger Zone
-                </label>
-                <div className="space-y-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
-                  >
-                    Export All Data
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
-                  >
-                    Delete Account
-                  </Button>
+              <div className="pt-4 border-t border-gray-200 dark:border-[#3a3a3c]">
+                <div className="p-4 bg-red-50/50 dark:bg-red-900/10 border border-red-200/60 dark:border-red-800/20 rounded-sm">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full"></div>
+                    <label className="text-sm font-semibold text-red-600 dark:text-red-400">
+                      Danger Zone
+                    </label>
+                  </div>
+                  <p className="text-xs text-red-600/80 dark:text-red-400/80 mb-4">
+                    These actions are irreversible. Please proceed with caution.
+                  </p>
+                  <div className="space-y-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-center text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/30 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-700/50 py-2 text-xs"
+                    >
+                      Export All Data
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-center text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/30 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-700/50 py-2 text-xs"
+                    >
+                      Delete Account
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 px-4 sm:px-6 py-4 bg-gray-50/50 border-t border-gray-100 rounded-b-sm">
+        {/* Sharp Footer */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-[#3a3a3c] bg-gray-50 dark:bg-[#1c1c1e]">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleResetDefaults}
-            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-2 h-auto text-xs sm:text-sm rounded-sm transition-colors flex items-center gap-2 justify-center sm:justify-start"
+            className="text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] px-3 py-2 text-sm transition-colors flex items-center gap-2"
           >
-            <RotateCcw className="w-3 h-3" />
-            <span className="hidden sm:inline">Reset to defaults</span>
-            <span className="sm:hidden">Reset</span>
+            <RotateCcw className="w-4 h-4" />
+            <span className="hidden sm:inline">Reset</span>
           </Button>
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 sm:px-4 py-2 h-auto text-xs sm:text-sm rounded-sm transition-colors flex-1 sm:flex-none"
+              className="text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] px-4 py-2 text-sm transition-colors"
             >
               Cancel
             </Button>
             <Button
               size="sm"
               onClick={handleClose}
-              className="bg-gray-900 hover:bg-gray-800 text-white px-3 sm:px-4 py-2 h-auto text-xs sm:text-sm shadow-sm rounded-sm transition-all flex-1 sm:flex-none"
+              className="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 px-4 py-2 text-sm shadow-sm transition-all"
             >
-              <span className="hidden sm:inline">Save preferences</span>
-              <span className="sm:hidden">Save</span>
+              Save
             </Button>
           </div>
         </div>

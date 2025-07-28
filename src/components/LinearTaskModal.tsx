@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './ui/button';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface LinearTaskModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
   onClose,
   onCreateTask,
 }) => {
+  const { theme } = useTheme();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('todo');
@@ -129,19 +131,19 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
       }}
     >
       <div
-        className={`bg-white text-gray-900 rounded-sm shadow-2xl w-full max-w-md mx-4 flex flex-col border border-gray-100 transition-all duration-300 ease-out transform ${isVisible
+        className={`bg-white dark:bg-[#2c2c2e] text-gray-900 dark:text-white rounded-sm shadow-2xl w-full max-w-md mx-4 flex flex-col border border-gray-100 dark:border-[#3a3a3c] transition-all duration-300 ease-out transform ${isVisible
           ? 'scale-100 opacity-100 translate-y-0'
           : 'scale-95 opacity-0 translate-y-4'
           }`}
       >
         {/* Minimal Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-50">
-          <h2 className="text-base font-medium text-gray-800">New Task</h2>
+        <div className="flex items-center justify-between p-4 border-b border-gray-50 dark:border-[#3a3a3c]">
+          <h2 className="text-base font-medium text-gray-800 dark:text-white">New Task</h2>
           <Button
             variant="ghost"
             size="icon"
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 h-7 w-7 rounded-sm transition-colors"
+            className="text-gray-400 dark:text-[#a1a1a6] hover:text-gray-600 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#3a3a3c] h-7 w-7 rounded-sm transition-colors"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -157,8 +159,8 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Task title"
-              className="w-full text-base font-medium text-gray-900 bg-transparent border-none outline-none min-h-[24px] leading-snug placeholder-gray-400"
-              style={{ caretColor: '#374151' }}
+              className="w-full text-base font-medium text-gray-900 dark:text-white bg-transparent border-none outline-none min-h-[24px] leading-snug placeholder-gray-400 dark:placeholder-[#6d6d70]"
+              style={{ caretColor: theme === 'dark' ? '#ffffff' : '#374151' }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
@@ -176,8 +178,8 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add description…"
-              className="w-full text-sm text-gray-600 bg-transparent border-none outline-none min-h-[60px] leading-relaxed resize-none placeholder-gray-400"
-              style={{ caretColor: '#374151' }}
+              className="w-full text-sm text-gray-600 dark:text-[#a1a1a6] bg-transparent border-none outline-none min-h-[60px] leading-relaxed resize-none placeholder-gray-400 dark:placeholder-[#6d6d70]"
+              style={{ caretColor: theme === 'dark' ? '#a1a1a6' : '#374151' }}
               onKeyDown={handleKeyDown}
             />
           </div>
@@ -188,7 +190,7 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 hover:bg-gray-50 px-2 py-1.5 h-auto rounded-sm transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98]"
+              className="flex items-center space-x-2 text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#3a3a3c] px-2 py-1.5 h-auto rounded-sm transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98]"
               onClick={() => {
                 setIsPriorityChanging(true);
                 setIsTextTransitioning(true);
@@ -236,7 +238,7 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
                   : 'bg-gray-200 scale-100'
                   } ${isPriorityChanging ? 'animate-pulse' : ''}`} />
               </div>
-              <span className={`text-xs transition-all duration-200 ease-out transform ${displayedPriority !== 'none' ? 'font-medium text-gray-700' : 'font-normal text-gray-500'
+              <span className={`text-xs transition-all duration-200 ease-out transform ${displayedPriority !== 'none' ? 'font-medium text-gray-700 dark:text-white' : 'font-normal text-gray-500 dark:text-[#a1a1a6]'
                 } ${isTextTransitioning
                   ? 'blur-sm scale-95 opacity-70'
                   : 'blur-0 scale-100 opacity-100'
@@ -248,8 +250,8 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
         </div>
 
         {/* Minimal Footer */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-25 border-t border-gray-50 rounded-b-sm">
-          <div className="text-xs text-gray-400">
+        <div className="flex items-center justify-between px-4 py-3 bg-gray-25 dark:bg-[#1c1c1e] border-t border-gray-50 dark:border-[#3a3a3c] rounded-b-sm">
+          <div className="text-xs text-gray-400 dark:text-[#6d6d70]">
             esc to close
           </div>
           <div className="flex items-center space-x-2">
@@ -257,7 +259,7 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-1.5 h-auto text-xs rounded-sm transition-colors"
+              className="text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] px-3 py-1.5 h-auto text-xs rounded-sm transition-colors"
             >
               Cancel
             </Button>
@@ -265,7 +267,7 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
               size="sm"
               onClick={handleCreateTask}
               disabled={!title.trim()}
-              className="bg-gray-900 hover:bg-gray-800 text-white px-3 py-1.5 h-auto text-xs disabled:bg-gray-200 disabled:text-gray-400 shadow-sm rounded-sm transition-all flex items-center gap-2"
+              className="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 px-3 py-1.5 h-auto text-xs disabled:bg-gray-200 dark:disabled:bg-[#3a3a3c] disabled:text-gray-400 dark:disabled:text-[#6d6d70] shadow-sm rounded-sm transition-all flex items-center gap-2"
             >
               Create
               <span className="text-xs opacity-70 font-normal">
