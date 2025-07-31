@@ -28,11 +28,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         if (storedTheme && (storedTheme === 'light' || storedTheme === 'dark')) {
           setThemeState(storedTheme);
         } else {
-          // Fall back to system preference
-          const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          const systemTheme = systemPrefersDark ? 'dark' : 'light';
-          setThemeState(systemTheme);
-          localStorage.setItem('theme', systemTheme);
+          // Default to light mode
+          setThemeState('light');
+          localStorage.setItem('theme', 'light');
         }
       } catch (error) {
         console.warn('Failed to initialize theme:', error);
@@ -44,19 +42,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
     initializeTheme();
 
-    // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      const storedTheme = localStorage.getItem('theme');
-      if (!storedTheme) {
-        const newTheme = e.matches ? 'dark' : 'light';
-        setThemeState(newTheme);
-        localStorage.setItem('theme', newTheme);
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    // Note: Removed system theme change listener to keep light mode as default
   }, []);
 
   // Apply theme to document

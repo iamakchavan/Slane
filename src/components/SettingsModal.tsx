@@ -25,16 +25,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const { theme, toggleTheme } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
-  const [localTheme, setLocalTheme] = useState('system');
+
   const [language, setLanguage] = useState('english');
   const [accentColor, setAccentColor] = useState('blue');
   const [transparentSidebar, setTransparentSidebar] = useState(false);
-  
+
   // Profile settings
   const [displayName, setDisplayName] = useState('Bittu Creators');
   const [email, setEmail] = useState('bittucreators@gmail.com');
   const [timezone, setTimezone] = useState('utc');
-  
+
   // Account settings
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
@@ -56,7 +56,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleResetDefaults = () => {
-    setLocalTheme('system');
     setLanguage('english');
     setAccentColor('blue');
     setTransparentSidebar(false);
@@ -68,11 +67,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     { id: 'account', label: 'Account', icon: SettingsIcon },
   ];
 
-  const themes = [
-    { id: 'system', label: 'System', preview: 'bg-gradient-to-br from-gray-100 to-gray-200' },
-    { id: 'light', label: 'Light', preview: 'bg-white border border-gray-200' },
-    { id: 'dark', label: 'Dark', preview: 'bg-gray-900 border border-gray-700' },
-  ];
+
 
   const accentColors = [
     { id: 'blue', color: 'bg-blue-500' },
@@ -84,28 +79,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ease-out ${
-        isVisible ? 'bg-black/20 backdrop-blur-sm' : 'bg-black/0'
-      }`}
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ease-out ${isVisible ? 'bg-black/20 backdrop-blur-sm' : 'bg-black/0'
+        }`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           handleClose();
         }
       }}
     >
-      <div 
-        className={`bg-white dark:bg-[#2c2c2e] text-gray-900 dark:text-white w-full max-w-md sm:max-w-2xl mx-auto flex flex-col border border-gray-200 dark:border-[#3a3a3c] transition-all duration-300 ease-out transform max-h-[90vh] shadow-2xl ${
-          isVisible 
-            ? 'scale-100 opacity-100 translate-y-0' 
-            : 'scale-95 opacity-0 translate-y-4'
-        }`}
+      <div
+        className={`bg-white dark:bg-[#2c2c2e] text-gray-900 dark:text-white w-full max-w-md sm:max-w-2xl mx-auto flex flex-col border border-gray-200 dark:border-[#3a3a3c] transition-all duration-300 ease-out transform max-h-[90vh] shadow-2xl ${isVisible
+          ? 'scale-100 opacity-100 translate-y-0'
+          : 'scale-95 opacity-0 translate-y-4'
+          }`}
       >
         {/* Sharp Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-[#3a3a3c]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-[#3a3a3c]">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Settings</h2>
-            <p className="text-sm text-gray-500 dark:text-[#a1a1a6] mt-0.5">Manage your preferences</p>
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white">Settings</h2>
+            <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">Manage your preferences</p>
           </div>
           <Button
             variant="ghost"
@@ -124,11 +117,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-3 text-sm font-medium transition-colors relative ${
-                  activeTab === tab.id
-                    ? 'text-gray-900 dark:text-white'
-                    : 'text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white'
-                }`}
+                className={`px-4 py-3 text-sm font-medium transition-colors relative ${activeTab === tab.id
+                  ? 'text-gray-900 dark:text-white'
+                  : 'text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white'
+                  }`}
               >
                 {tab.label}
                 {activeTab === tab.id && (
@@ -155,15 +147,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </button>
                 </div>
                 <div className="mt-4 sm:mt-0">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Bittu Creators</h3>
-                  <p className="text-sm text-gray-500 dark:text-[#a1a1a6]">bittucreators@gmail.com</p>
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">Bittu Creators</h3>
+                  <p className="text-xs text-gray-500 dark:text-[#a1a1a6]">bittucreators@gmail.com</p>
                 </div>
               </div>
 
               {/* Form Fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  <label className="block text-xs font-medium text-gray-900 dark:text-white mb-2">
                     Display Name
                   </label>
                   <input
@@ -176,7 +168,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  <label className="block text-xs font-medium text-gray-900 dark:text-white mb-2">
                     Email Address
                   </label>
                   <input
@@ -189,7 +181,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  <label className="block text-xs font-medium text-gray-900 dark:text-white mb-2">
                     Timezone
                   </label>
                   <Select value={timezone} onValueChange={setTimezone}>
@@ -214,7 +206,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               {/* Language */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  <label className="block text-xs font-medium text-gray-900 dark:text-white mb-2">
                     Language
                   </label>
                   <Select value={language} onValueChange={setLanguage}>
@@ -234,7 +226,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
               {/* Interface Theme */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-3">
+                <label className="block text-xs font-medium text-gray-900 dark:text-white mb-2">
                   Interface Theme
                 </label>
                 <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mb-3">
@@ -242,7 +234,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </p>
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c] rounded-sm">
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                    <label className="block text-xs font-medium text-gray-900 dark:text-white">
                       Dark Mode
                     </label>
                     <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
@@ -251,14 +243,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                   <button
                     onClick={toggleTheme}
-                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${
-                      theme === 'dark' ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
-                    }`}
+                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${theme === 'dark' ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
+                      }`}
                   >
                     <span
-                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${
-                        theme === 'dark' ? 'translate-x-5' : 'translate-x-1'
-                      }`}
+                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${theme === 'dark' ? 'translate-x-5' : 'translate-x-1'
+                        }`}
                     />
                   </button>
                 </div>
@@ -266,7 +256,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
               {/* Accent Color */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                <label className="block text-xs font-medium text-gray-900 dark:text-white mb-2">
                   Accent Color
                 </label>
                 <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mb-3">
@@ -277,11 +267,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <button
                       key={color.id}
                       onClick={() => setAccentColor(color.id)}
-                      className={`w-10 h-10 ${color.color} transition-all ${
-                        accentColor === color.id
-                          ? 'ring-2 ring-offset-2 ring-gray-400 scale-110'
-                          : 'hover:scale-105'
-                      }`}
+                      className={`w-10 h-10 ${color.color} transition-all ${accentColor === color.id
+                        ? 'ring-2 ring-offset-2 ring-gray-400 scale-110'
+                        : 'hover:scale-105'
+                        }`}
                     />
                   ))}
                 </div>
@@ -290,7 +279,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               {/* Transparent Sidebar */}
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                  <label className="block text-xs font-medium text-gray-900 dark:text-white">
                     Transparent Sidebar
                   </label>
                   <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
@@ -299,14 +288,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
                 <button
                   onClick={() => setTransparentSidebar(!transparentSidebar)}
-                  className={`relative inline-flex h-5 w-9 items-center transition-colors ${
-                    transparentSidebar ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
-                  }`}
+                  className={`relative inline-flex h-5 w-9 items-center transition-colors ${transparentSidebar ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
+                    }`}
                 >
                   <span
-                    className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${
-                      transparentSidebar ? 'translate-x-5' : 'translate-x-1'
-                    }`}
+                    className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${transparentSidebar ? 'translate-x-5' : 'translate-x-1'
+                      }`}
                   />
                 </button>
               </div>
@@ -319,12 +306,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-blue-900 dark:text-blue-400">Free Plan</p>
+                    <p className="text-xs font-semibold text-blue-900 dark:text-blue-400">Free Plan</p>
                     <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">Basic features with limited storage</p>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={onOpenPricing}
                     className="text-xs h-7 px-3 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/30"
                   >
@@ -338,7 +325,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {/* Email Notifications */}
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                    <label className="block text-xs font-medium text-gray-900 dark:text-white">
                       Email Notifications
                     </label>
                     <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
@@ -347,14 +334,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                   <button
                     onClick={() => setEmailNotifications(!emailNotifications)}
-                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${
-                      emailNotifications ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
-                    }`}
+                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${emailNotifications ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
+                      }`}
                   >
                     <span
-                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${
-                        emailNotifications ? 'translate-x-5' : 'translate-x-1'
-                      }`}
+                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${emailNotifications ? 'translate-x-5' : 'translate-x-1'
+                        }`}
                     />
                   </button>
                 </div>
@@ -362,7 +347,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {/* Auto Save */}
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                    <label className="block text-xs font-medium text-gray-900 dark:text-white">
                       Auto Save
                     </label>
                     <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
@@ -371,14 +356,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                   <button
                     onClick={() => setAutoSave(!autoSave)}
-                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${
-                      autoSave ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
-                    }`}
+                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${autoSave ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
+                      }`}
                   >
                     <span
-                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${
-                        autoSave ? 'translate-x-5' : 'translate-x-1'
-                      }`}
+                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${autoSave ? 'translate-x-5' : 'translate-x-1'
+                        }`}
                     />
                   </button>
                 </div>
@@ -386,7 +369,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {/* Task Reminders */}
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                    <label className="block text-xs font-medium text-gray-900 dark:text-white">
                       Task Reminders
                     </label>
                     <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
@@ -395,14 +378,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                   <button
                     onClick={() => setTaskReminders(!taskReminders)}
-                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${
-                      taskReminders ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
-                    }`}
+                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${taskReminders ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
+                      }`}
                   >
                     <span
-                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${
-                        taskReminders ? 'translate-x-5' : 'translate-x-1'
-                      }`}
+                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${taskReminders ? 'translate-x-5' : 'translate-x-1'
+                        }`}
                     />
                   </button>
                 </div>
@@ -413,7 +394,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="p-4 bg-red-50/50 dark:bg-red-900/10 border border-red-200/60 dark:border-red-800/20 rounded-sm">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full"></div>
-                    <label className="text-sm font-semibold text-red-600 dark:text-red-400">
+                    <label className="text-xs font-semibold text-red-600 dark:text-red-400">
                       Danger Zone
                     </label>
                   </div>
@@ -448,7 +429,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             variant="ghost"
             size="sm"
             onClick={handleResetDefaults}
-            className="text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] px-3 py-2 text-sm transition-colors flex items-center gap-2"
+            className="text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] px-3 py-2 text-xs transition-colors flex items-center gap-2"
           >
             <RotateCcw className="w-4 h-4" />
             <span className="hidden sm:inline">Reset</span>
@@ -458,14 +439,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] px-4 py-2 text-sm transition-colors"
+              className="text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3a3a3c] px-4 py-2 text-xs transition-colors"
             >
               Cancel
             </Button>
             <Button
               size="sm"
               onClick={handleClose}
-              className="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 px-4 py-2 text-sm shadow-sm transition-all"
+              className="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 px-4 py-2 text-xs shadow-sm transition-all"
             >
               Save
             </Button>

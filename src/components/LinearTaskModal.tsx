@@ -271,7 +271,7 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
             >
               Create
               <span className="text-xs opacity-70 font-normal">
-                {/(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent) ? '⌘↵' : 'Ctrl+↵'}
+                {/(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent) ? '⌘↵' : 'C+↵'}
               </span>
             </Button>
           </div>

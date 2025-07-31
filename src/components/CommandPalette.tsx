@@ -122,7 +122,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   return (
     <div 
-      className={`fixed inset-0 z-[60] flex items-start justify-center pt-24 transition-all duration-300 ease-out ${
+      className={`fixed inset-0 z-[60] flex items-start justify-center pt-20 transition-all duration-300 ease-out ${
         isVisible ? 'bg-black/20 backdrop-blur-sm' : 'bg-black/0'
       }`}
       onClick={(e) => {
@@ -132,63 +132,59 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       }}
     >
       <div 
-        className={`bg-white dark:bg-[#2c2c2e] w-full max-w-xl mx-4 flex flex-col border border-gray-200/60 dark:border-[#3a3a3c] shadow-2xl rounded-sm transition-all duration-300 ease-out transform ${
+        className={`bg-white dark:bg-[#2c2c2e] w-full max-w-lg mx-4 flex flex-col border border-gray-200/60 dark:border-[#3a3a3c] shadow-lg rounded-sm transition-all duration-300 ease-out transform ${
           isVisible 
             ? 'scale-100 opacity-100 translate-y-0' 
             : 'scale-95 opacity-0 translate-y-4'
         }`}
       >
         {/* Search Input */}
-        <div className="flex items-center px-6 py-4 border-b border-gray-200/60 dark:border-[#3a3a3c]">
-          <Search className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6] mr-4" />
+        <div className="flex items-center px-4 py-3 border-b border-gray-200/60 dark:border-[#3a3a3c]">
+          <Search className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6] mr-3" />
           <input
             ref={inputRef}
             type="text"
-            placeholder="Type a command or search..."
+            placeholder="Search commands..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 text-sm bg-transparent outline-none placeholder-gray-400 dark:placeholder-[#6d6d70] text-gray-900 dark:text-white"
+            className="flex-1 text-xs bg-transparent outline-none placeholder-gray-400 dark:placeholder-[#6d6d70] text-gray-900 dark:text-white"
             style={{ caretColor: theme === 'dark' ? '#ffffff' : '#374151' }}
           />
-          <div className="flex items-center gap-1 ml-4">
-            <kbd className="px-2.5 py-1.5 text-xs bg-gray-100 dark:bg-[#1c1c1e] text-gray-600 dark:text-[#a1a1a6] border border-gray-200 dark:border-[#3a3a3c] rounded-sm font-medium">
-              ⌘K
-            </kbd>
-          </div>
+          <kbd className="px-2 py-1 text-xs bg-gray-100 dark:bg-[#1c1c1e] text-gray-500 dark:text-[#a1a1a6] border border-gray-200 dark:border-[#3a3a3c] rounded">
+            ⌘K
+          </kbd>
         </div>
 
         {/* Commands List */}
-        <div className="overflow-y-auto scrollbar-minimal">
+        <div className="overflow-y-auto scrollbar-minimal max-h-80">
           {filteredCommands.length === 0 ? (
-            <div className="px-6 py-12 text-center text-gray-500 dark:text-[#6d6d70]">
-              <Search className="w-8 h-8 mx-auto mb-3 text-gray-300 dark:text-[#6d6d70]" />
-              <p className="text-sm">No commands found</p>
+            <div className="px-4 py-8 text-center text-gray-500 dark:text-[#6d6d70]">
+              <Search className="w-6 h-6 mx-auto mb-2 text-gray-300 dark:text-[#6d6d70]" />
+              <p className="text-xs">No commands found</p>
             </div>
           ) : (
-            <div className="py-3">
+            <div className="py-1">
               {filteredCommands.map((command, index) => {
                 const IconComponent = command.icon;
                 return (
                   <button
                     key={command.id}
                     onClick={command.action}
-                    className={`w-full flex items-center px-6 py-3 text-left transition-all duration-150 ${
+                    className={`w-full flex items-center px-4 py-2.5 text-left transition-colors duration-150 ${
                       index === selectedIndex
-                        ? 'bg-gray-100 dark:bg-[#3a3a3c] text-gray-900 dark:text-white'
-                        : 'text-gray-700 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-[#3a3a3c]/50'
+                        ? 'bg-gray-100/80 dark:bg-[#3a3a3c] text-gray-900 dark:text-white'
+                        : 'text-gray-700 dark:text-[#a1a1a6] hover:bg-gray-50/60 dark:hover:bg-[#3a3a3c]/50'
                     }`}
                   >
-                    <div className="flex items-center justify-center w-5 h-5 mr-4">
-                      <IconComponent className={`w-4 h-4 ${
-                        index === selectedIndex ? 'text-gray-600 dark:text-white' : 'text-gray-400 dark:text-[#a1a1a6]'
-                      }`} />
-                    </div>
-                    <span className="flex-1 text-sm font-normal leading-relaxed">
+                    <IconComponent className={`w-4 h-4 mr-3 flex-shrink-0 ${
+                      index === selectedIndex ? 'text-gray-600 dark:text-white' : 'text-gray-400 dark:text-[#a1a1a6]'
+                    }`} />
+                    <span className="flex-1 text-xs font-normal">
                       {command.label}
                     </span>
                     {command.shortcut && (
-                      <kbd className="px-2.5 py-1.5 text-xs bg-gray-100 dark:bg-[#1c1c1e] text-gray-600 dark:text-[#a1a1a6] border border-gray-200 dark:border-[#3a3a3c] rounded-sm font-medium ml-4">
+                      <kbd className="px-2 py-1 text-xs bg-gray-100 dark:bg-[#1c1c1e] text-gray-500 dark:text-[#a1a1a6] border border-gray-200 dark:border-[#3a3a3c] rounded ml-3">
                         {command.shortcut}
                       </kbd>
                     )}
@@ -200,18 +196,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-gray-200/60 dark:border-[#3a3a3c] bg-gray-50/50 dark:bg-[#1c1c1e]/50">
-          <div className="flex items-center justify-center gap-6 text-xs text-gray-500 dark:text-[#6d6d70]">
-            <span className="flex items-center gap-2">
-              <kbd className="px-2 py-1 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded-sm font-medium text-gray-600 dark:text-[#a1a1a6]">↑↓</kbd>
+        <div className="px-4 py-2.5 border-t border-gray-200/60 dark:border-[#3a3a3c] bg-gray-50/30 dark:bg-[#1c1c1e]/30">
+          <div className="flex items-center justify-center gap-4 text-xs text-gray-500 dark:text-[#6d6d70]">
+            <span className="flex items-center gap-1.5">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded text-gray-600 dark:text-[#a1a1a6]">↑↓</kbd>
               navigate
             </span>
-            <span className="flex items-center gap-2">
-              <kbd className="px-2 py-1 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded-sm font-medium text-gray-600 dark:text-[#a1a1a6]">↵</kbd>
+            <span className="flex items-center gap-1.5">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded text-gray-600 dark:text-[#a1a1a6]">↵</kbd>
               select
             </span>
-            <span className="flex items-center gap-2">
-              <kbd className="px-2 py-1 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded-sm font-medium text-gray-600 dark:text-[#a1a1a6]">esc</kbd>
+            <span className="flex items-center gap-1.5">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded text-gray-600 dark:text-[#a1a1a6]">esc</kbd>
               close
             </span>
           </div>

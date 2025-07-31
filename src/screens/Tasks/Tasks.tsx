@@ -290,7 +290,7 @@ export const Tasks = (): JSX.Element => {
         w-72
         shadow-sm lg:shadow-none
       `}>
-        <div className="flex flex-col min-h-screen p-4 w-full">
+        <div className="flex flex-col h-full px-4 py-4 w-full">
           {/* Sidebar Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center justify-between w-full">
@@ -305,10 +305,7 @@ export const Tasks = (): JSX.Element => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-48 shadow-sm border-gray-200/60 dark:border-[#3a3a3c] rounded-sm bg-white dark:bg-[#2c2c2e]">
-                  <DropdownMenuItem className="text-sm flex items-center gap-3">
-                    <Building2 className="w-4 h-4 text-gray-500" />
-                    Switch workspace
-                  </DropdownMenuItem>
+
                   <DropdownMenuItem
                     className="text-sm flex items-center gap-3"
                     onClick={() => setShowSettingsModal(true)}
@@ -377,7 +374,7 @@ export const Tasks = (): JSX.Element => {
             </div>
 
             {/* User Profile - Positioned at bottom */}
-            <div className="border-t border-gray-200/60 dark:border-[#3a3a3c] pt-4 mt-auto pb-4">
+            <div className="border-t border-gray-200/60 dark:border-[#3a3a3c] pt-4 mt-auto pb-1">
               {!showAccountUI ? (
                 <div
                   className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-gray-100/40 dark:hover:bg-[#2c2c2e] cursor-pointer transition-colors"
@@ -474,10 +471,7 @@ export const Tasks = (): JSX.Element => {
                             <Settings className="w-4 h-4 text-gray-500 dark:text-[#a1a1a6]" />
                             Settings
                           </Button>
-                          <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 dark:hover:bg-[#3a3a3c] rounded-sm flex items-center gap-3 text-gray-700 dark:text-[#a1a1a6]">
-                            <LifeBuoy className="w-4 h-4 text-gray-500 dark:text-[#a1a1a6]" />
-                            Help & Support
-                          </Button>
+
                           <Button variant="ghost" size="sm" className="w-full justify-start text-sm h-9 px-2.5 hover:bg-gray-100/60 dark:hover:bg-red-900/20 rounded-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50/50 dark:hover:bg-red-900/30 flex items-center gap-3">
                             <LogOut className="w-4 h-4 text-red-500 dark:text-red-400" />
                             Sign Out
