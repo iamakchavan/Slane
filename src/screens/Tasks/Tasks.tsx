@@ -6,11 +6,9 @@ import {
   PanelLeftIcon,
   X,
   Settings,
-  Building2,
   Edit,
   Copy,
   Trash2,
-  LifeBuoy,
   LogOut
 } from "lucide-react";
 import { useState, useEffect } from "react";
