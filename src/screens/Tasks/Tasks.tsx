@@ -24,6 +24,7 @@ import { LinearTaskModal } from "../../components/LinearTaskModal";
 import { PricingModal } from "../../components/PricingModal";
 import { SettingsModal } from "../../components/SettingsModal";
 import { CommandPalette } from "../../components/CommandPalette";
+import { EditTaskModal } from "../../components/EditTaskModal";
 import { useTheme } from "../../contexts/ThemeContext";
 import { getPriorityColors } from "../../lib/theme-utils";
 import {
@@ -47,6 +48,8 @@ export const Tasks = (): JSX.Element => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
 
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
@@ -174,10 +177,20 @@ export const Tasks = (): JSX.Element => {
     }
   };
 
-  const editTask = (taskId: string, newName: string) => {
+  const editTask = (taskId: string, updatedTask: Partial<Task>) => {
     setTasks(tasks.map(task =>
-      task.id === taskId ? { ...task, name: newName } : task
+      task.id === taskId ? { ...task, ...updatedTask } : task
     ));
+  };
+
+  const openEditModal = (task: Task) => {
+    setEditingTask(task);
+    setEditTaskModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setEditTaskModalOpen(false);
+    setEditingTask(null);
   };
 
   const toggleTaskExpansion = (taskId: string) => {
@@ -596,12 +609,7 @@ export const Tasks = (): JSX.Element => {
                         <DropdownMenuContent align="end" className="shadow-sm border-gray-200/60 rounded-sm">
                           <DropdownMenuItem
                             className="text-sm flex items-center gap-3"
-                            onClick={() => {
-                              const newName = prompt("Edit task name:", task.name);
-                              if (newName && newName.trim()) {
-                                editTask(task.id, newName.trim());
-                              }
-                            }}
+                            onClick={() => openEditModal(task)}
                           >
                             <Edit className="w-4 h-4 text-gray-500" />
                             Edit
@@ -667,12 +675,7 @@ export const Tasks = (): JSX.Element => {
                         <DropdownMenuContent align="end" className="shadow-sm border-gray-200/60 rounded-sm">
                           <DropdownMenuItem
                             className="text-sm flex items-center gap-3"
-                            onClick={() => {
-                              const newName = prompt("Edit task name:", task.name);
-                              if (newName && newName.trim()) {
-                                editTask(task.id, newName.trim());
-                              }
-                            }}
+                            onClick={() => openEditModal(task)}
                           >
                             <Edit className="w-4 h-4 text-gray-500" />
                             Edit
@@ -751,6 +754,14 @@ export const Tasks = (): JSX.Element => {
           setCommandPaletteOpen(false);
           setNewTaskModalOpen(true);
         }}
+      />
+
+      {/* Edit Task Modal */}
+      <EditTaskModal
+        isOpen={editTaskModalOpen}
+        onClose={closeEditModal}
+        task={editingTask}
+        onSave={editTask}
       />
     </div>
   );
