@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './ui/button';
 import { useTheme } from '../contexts/ThemeContext';
+import { DatePicker } from './DatePicker';
 
 interface LinearTaskModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface LinearTaskModalProps {
     description: string;
     status: string;
     priority: 'none' | 'low' | 'medium' | 'high';
+    dueDate?: Date;
   }) => void;
 }
 
@@ -24,6 +26,7 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('todo');
   const [priority, setPriority] = useState<'none' | 'low' | 'medium' | 'high'>('none');
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [isVisible, setIsVisible] = useState(false);
   const [isPriorityChanging, setIsPriorityChanging] = useState(false);
   const [displayedPriority, setDisplayedPriority] = useState<'none' | 'low' | 'medium' | 'high'>('none');
@@ -38,6 +41,7 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
       setDescription('');
       setStatus('todo');
       setPriority('none');
+      setDueDate(undefined);
       setDisplayedPriority('none');
       setIsPriorityChanging(false);
       setIsTextTransitioning(false);
@@ -90,13 +94,14 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
         description: description.trim(),
         status,
         priority,
+        dueDate,
       });
       setIsVisible(false);
       setTimeout(() => {
         onClose();
       }, 300);
     }
-  }, [title, description, status, priority, onCreateTask, onClose]);
+  }, [title, description, status, priority, dueDate, onCreateTask, onClose]);
 
   const handleClose = useCallback(() => {
     setIsVisible(false);
@@ -246,6 +251,13 @@ export const LinearTaskModal: React.FC<LinearTaskModalProps> = ({
                 {displayedPriority === 'none' ? 'Priority' : displayedPriority.charAt(0).toUpperCase() + displayedPriority.slice(1)}
               </span>
             </Button>
+
+            {/* Due Date Picker */}
+            <DatePicker
+              value={dueDate}
+              onChange={setDueDate}
+              placeholder="Due date"
+            />
           </div>
         </div>
 

@@ -27,6 +27,7 @@ import { CommandPalette } from "../../components/CommandPalette";
 import { EditTaskModal } from "../../components/EditTaskModal";
 import { useTheme } from "../../contexts/ThemeContext";
 import { getPriorityColors } from "../../lib/theme-utils";
+import { formatDueDate, isToday, isOverdue } from "../../lib/date-utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +41,7 @@ interface Task {
   description?: string;
   completed: boolean;
   priority: "high" | "medium" | "low";
+  dueDate?: Date;
 }
 
 export const Tasks = (): JSX.Element => {
@@ -66,6 +68,7 @@ export const Tasks = (): JSX.Element => {
       description: "Go through the complete marketing proposal and provide detailed feedback on strategy, budget allocation, and timeline.",
       completed: false,
       priority: "high",
+      dueDate: new Date(), // Due today
     },
     {
       id: "2",
@@ -73,6 +76,7 @@ export const Tasks = (): JSX.Element => {
       description: "Set up a meeting to discuss the latest design iterations and gather feedback from the team.",
       completed: false,
       priority: "medium",
+      dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Due tomorrow
     },
     {
       id: "3",
@@ -87,6 +91,7 @@ export const Tasks = (): JSX.Element => {
       description: "Gather and organize all user feedback received since the last release to identify key improvement areas.",
       completed: true,
       priority: "medium",
+      dueDate: new Date(Date.now() - 24 * 60 * 60 * 1000), // Overdue (yesterday)
     },
   ]);
 
@@ -124,6 +129,8 @@ export const Tasks = (): JSX.Element => {
     { id: "2", name: "Active", selected: activeFilter === "2", count: tasks.filter(t => !t.completed).length },
     { id: "3", name: "Completed", selected: activeFilter === "3", count: tasks.filter(t => t.completed).length },
     { id: "4", name: "High Priority", selected: activeFilter === "4", count: tasks.filter(t => t.priority === "high").length },
+    { id: "5", name: "Due Today", selected: activeFilter === "5", count: tasks.filter(t => t.dueDate && isToday(t.dueDate)).length },
+    { id: "6", name: "Overdue", selected: activeFilter === "6", count: tasks.filter(t => t.dueDate && isOverdue(t.dueDate)).length },
   ];
 
   // Filter tasks based on active filter
@@ -132,6 +139,8 @@ export const Tasks = (): JSX.Element => {
       case "2": return tasks.filter(t => !t.completed);
       case "3": return tasks.filter(t => t.completed);
       case "4": return tasks.filter(t => t.priority === "high");
+      case "5": return tasks.filter(t => t.dueDate && isToday(t.dueDate));
+      case "6": return tasks.filter(t => t.dueDate && isOverdue(t.dueDate));
       default: return tasks;
     }
   })();
@@ -149,6 +158,7 @@ export const Tasks = (): JSX.Element => {
     description: string;
     status: string;
     priority: 'none' | 'low' | 'medium' | 'high';
+    dueDate?: Date;
   }) => {
     const newTask: Task = {
       id: Date.now().toString(),
@@ -156,6 +166,7 @@ export const Tasks = (): JSX.Element => {
       description: taskData.description || undefined,
       completed: false,
       priority: taskData.priority === 'none' ? 'low' : taskData.priority,
+      dueDate: taskData.dueDate,
     };
     setTasks([newTask, ...tasks]);
   };
@@ -543,6 +554,9 @@ export const Tasks = (): JSX.Element => {
               <div className="w-24">
                 <span className="font-normal text-sm text-gray-600 dark:text-[#a1a1a6]">Priority</span>
               </div>
+              <div className="w-24">
+                <span className="font-normal text-sm text-gray-600 dark:text-[#a1a1a6]">Due Date</span>
+              </div>
               <div className="w-10" />
             </div>
 
@@ -594,6 +608,13 @@ export const Tasks = (): JSX.Element => {
                           {task.priority}
                         </span>
                       </button>
+                    </div>
+                    <div className="w-24">
+                      {task.dueDate && (
+                        <div className={`text-xs ${formatDueDate(task.dueDate).className}`}>
+                          {formatDueDate(task.dueDate).text}
+                        </div>
+                      )}
                     </div>
                     <div className="w-10">
                       <DropdownMenu>
@@ -656,6 +677,11 @@ export const Tasks = (): JSX.Element => {
                             </span>
                           )}
                         </div>
+                        {task.dueDate && (
+                          <div className={`mt-1 text-xs ${formatDueDate(task.dueDate).className}`}>
+                            Due {formatDueDate(task.dueDate).text}
+                          </div>
+                        )}
                         {task.description && expandedTasks.has(task.id) && (
                           <div className="mt-2 text-xs text-gray-600 dark:text-[#a1a1a6] leading-relaxed">
                             {task.description}

@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
+import { DatePicker } from "./DatePicker";
 
 interface Task {
   id: string;
@@ -11,6 +12,7 @@ interface Task {
   description?: string;
   completed: boolean;
   priority: "high" | "medium" | "low";
+  dueDate?: Date;
 }
 
 interface EditTaskModalProps {
@@ -24,7 +26,8 @@ export const EditTaskModal = ({ isOpen, onClose, task, onSave }: EditTaskModalPr
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    priority: "medium" as "high" | "medium" | "low"
+    priority: "medium" as "high" | "medium" | "low",
+    dueDate: undefined as Date | undefined
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -38,7 +41,8 @@ export const EditTaskModal = ({ isOpen, onClose, task, onSave }: EditTaskModalPr
       setFormData({
         name: task.name,
         description: task.description || "",
-        priority: task.priority
+        priority: task.priority,
+        dueDate: task.dueDate
       });
       setDisplayedPriority(task.priority);
     }
@@ -72,7 +76,8 @@ export const EditTaskModal = ({ isOpen, onClose, task, onSave }: EditTaskModalPr
     onSave(task.id, {
       name: formData.name.trim(),
       description: formData.description.trim() || undefined,
-      priority: formData.priority
+      priority: formData.priority,
+      dueDate: formData.dueDate
     });
     
     setIsSubmitting(false);
@@ -235,6 +240,19 @@ export const EditTaskModal = ({ isOpen, onClose, task, onSave }: EditTaskModalPr
                 {displayedPriority.charAt(0).toUpperCase() + displayedPriority.slice(1)}
               </span>
             </Button>
+          </div>
+
+          {/* Due Date */}
+          <div className="space-y-2">
+            <Label className="text-xs font-medium text-gray-900 dark:text-white">
+              Due Date (Optional)
+            </Label>
+            <DatePicker
+              value={formData.dueDate}
+              onChange={(date) => setFormData(prev => ({ ...prev, dueDate: date }))}
+              placeholder="Set due date"
+              className="w-full"
+            />
           </div>
         </form>
 
