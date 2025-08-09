@@ -581,13 +581,13 @@ export const Tasks = (): JSX.Element => {
                       >
                         {task.name}
                         {task.description && (
-                          <span className="ml-2 text-xs text-gray-400 dark:text-[#6d6d70]">
-                            {expandedTasks.has(task.id) ? '▼' : '▶'}
-                          </span>
+                          <ChevronDownIcon className={`inline ml-2 w-3 h-3 text-gray-400 dark:text-[#6d6d70] transition-transform duration-200 ease-out ${
+                            expandedTasks.has(task.id) ? 'rotate-0' : '-rotate-90'
+                          }`} />
                         )}
                       </div>
                       {task.description && expandedTasks.has(task.id) && (
-                        <div className="mt-2 text-xs text-gray-600 dark:text-[#a1a1a6] leading-relaxed">
+                        <div className="mt-2 pl-4 border-l-2 border-gray-200/40 dark:border-[#3a3a3c]/40 text-sm text-gray-600 dark:text-[#a1a1a6] leading-relaxed">
                           {task.description}
                         </div>
                       )}
@@ -672,9 +672,9 @@ export const Tasks = (): JSX.Element => {
                         >
                           {task.name}
                           {task.description && (
-                            <span className="ml-2 text-xs text-gray-400">
-                              {expandedTasks.has(task.id) ? '▼' : '▶'}
-                            </span>
+                            <ChevronDownIcon className={`inline ml-2 w-3 h-3 text-gray-400 dark:text-[#6d6d70] transition-transform duration-200 ease-out ${
+                              expandedTasks.has(task.id) ? 'rotate-0' : '-rotate-90'
+                            }`} />
                           )}
                         </div>
                         {task.dueDate && (
@@ -683,7 +683,7 @@ export const Tasks = (): JSX.Element => {
                           </div>
                         )}
                         {task.description && expandedTasks.has(task.id) && (
-                          <div className="mt-2 text-xs text-gray-600 dark:text-[#a1a1a6] leading-relaxed">
+                          <div className="mt-2 pl-4 border-l-2 border-gray-200/40 dark:border-[#3a3a3c]/40 text-sm text-gray-600 dark:text-[#a1a1a6] leading-relaxed">
                             {task.description}
                           </div>
                         )}

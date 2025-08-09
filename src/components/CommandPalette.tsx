@@ -197,15 +197,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
         {/* Footer */}
         <div className="px-4 py-2.5 border-t border-gray-200/60 dark:border-[#3a3a3c] bg-gray-50/30 dark:bg-[#1c1c1e]/30">
-          <div className="flex items-center justify-center gap-4 text-xs text-gray-500 dark:text-[#6d6d70]">
-            <span className="flex items-center gap-1.5">
-              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded text-gray-600 dark:text-[#a1a1a6]">↑↓</kbd>
-              navigate
-            </span>
-            <span className="flex items-center gap-1.5">
-              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded text-gray-600 dark:text-[#a1a1a6]">↵</kbd>
-              select
-            </span>
+          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-[#6d6d70]">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1.5">
+                <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded text-gray-600 dark:text-[#a1a1a6]">↑↓</kbd>
+                navigate
+              </span>
+              <span className="flex items-center gap-1.5">
+                <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded text-gray-600 dark:text-[#a1a1a6]">↵</kbd>
+                select
+              </span>
+            </div>
             <span className="flex items-center gap-1.5">
               <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#2c2c2e] border border-gray-200 dark:border-[#3a3a3c] rounded text-gray-600 dark:text-[#a1a1a6]">esc</kbd>
               close
