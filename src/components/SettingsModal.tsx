@@ -27,8 +27,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [activeTab, setActiveTab] = useState('profile');
 
   const [language, setLanguage] = useState('english');
-  const [accentColor, setAccentColor] = useState('blue');
-  const [transparentSidebar, setTransparentSidebar] = useState(false);
 
   // Profile settings
   const [displayName, setDisplayName] = useState('Bittu Creators');
@@ -36,7 +34,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [timezone, setTimezone] = useState('utc');
 
   // Account settings
-  const [emailNotifications, setEmailNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [taskReminders, setTaskReminders] = useState(false);
 
@@ -57,8 +54,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const handleResetDefaults = () => {
     setLanguage('english');
-    setAccentColor('blue');
-    setTransparentSidebar(false);
   };
 
   const tabs = [
@@ -69,12 +64,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
 
 
-  const accentColors = [
-    { id: 'blue', color: 'bg-blue-500' },
-    { id: 'orange', color: 'bg-orange-500' },
-    { id: 'pink', color: 'bg-pink-500' },
-    { id: 'green', color: 'bg-green-500' },
-  ];
+
 
   if (!isOpen) return null;
 
@@ -254,49 +244,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              {/* Accent Color */}
-              <div>
-                <label className="block text-xs font-medium text-gray-900 dark:text-white mb-2">
-                  Accent Color
-                </label>
-                <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mb-3">
-                  Select your application accent color
-                </p>
-                <div className="flex space-x-4">
-                  {accentColors.map((color) => (
-                    <button
-                      key={color.id}
-                      onClick={() => setAccentColor(color.id)}
-                      className={`w-10 h-10 ${color.color} transition-all ${accentColor === color.id
-                        ? 'ring-2 ring-offset-2 ring-gray-400 scale-110'
-                        : 'hover:scale-105'
-                        }`}
-                    />
-                  ))}
-                </div>
-              </div>
 
-              {/* Transparent Sidebar */}
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">
-                <div>
-                  <label className="block text-xs font-medium text-gray-900 dark:text-white">
-                    Transparent Sidebar
-                  </label>
-                  <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
-                    Add transparency layer to your sidebar
-                  </p>
-                </div>
-                <button
-                  onClick={() => setTransparentSidebar(!transparentSidebar)}
-                  className={`relative inline-flex h-5 w-9 items-center transition-colors ${transparentSidebar ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
-                    }`}
-                >
-                  <span
-                    className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${transparentSidebar ? 'translate-x-5' : 'translate-x-1'
-                      }`}
-                  />
-                </button>
-              </div>
+
+
             </div>
           )}
 
@@ -322,27 +272,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
               {/* Settings */}
               <div className="space-y-3">
-                {/* Email Notifications */}
-                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-900 dark:text-white">
-                      Email Notifications
-                    </label>
-                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5">
-                      Receive updates about tasks
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setEmailNotifications(!emailNotifications)}
-                    className={`relative inline-flex h-5 w-9 items-center transition-colors ${emailNotifications ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-[#6d6d70]'
-                      }`}
-                  >
-                    <span
-                      className={`inline-block h-3 w-3 transform bg-white dark:bg-gray-900 transition-transform ${emailNotifications ? 'translate-x-5' : 'translate-x-1'
-                        }`}
-                    />
-                  </button>
-                </div>
+
 
                 {/* Auto Save */}
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1c1c1e] border border-gray-200 dark:border-[#3a3a3c]">

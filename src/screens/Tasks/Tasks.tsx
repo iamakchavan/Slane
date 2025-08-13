@@ -9,7 +9,13 @@ import {
   Edit,
   Copy,
   Trash2,
-  LogOut
+  LogOut,
+  List,
+  Square,
+  CheckSquare,
+  AlertCircle,
+  Calendar,
+  Clock
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
@@ -25,6 +31,9 @@ import { PricingModal } from "../../components/PricingModal";
 import { SettingsModal } from "../../components/SettingsModal";
 import { CommandPalette } from "../../components/CommandPalette";
 import { EditTaskModal } from "../../components/EditTaskModal";
+import { DatePicker } from "../../components/DatePicker";
+import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover";
+import { Calendar as CalendarComponent } from "../../components/ui/calendar";
 import { useTheme } from "../../contexts/ThemeContext";
 import { getPriorityColors } from "../../lib/theme-utils";
 import { formatDueDate, isToday, isOverdue } from "../../lib/date-utils";
@@ -125,12 +134,12 @@ export const Tasks = (): JSX.Element => {
 
   // Computed sidebar data based on current tasks
   const sidebarItems = [
-    { id: "1", name: "All Tasks", selected: activeFilter === "1", count: tasks.length },
-    { id: "2", name: "Active", selected: activeFilter === "2", count: tasks.filter(t => !t.completed).length },
-    { id: "3", name: "Completed", selected: activeFilter === "3", count: tasks.filter(t => t.completed).length },
-    { id: "4", name: "High Priority", selected: activeFilter === "4", count: tasks.filter(t => t.priority === "high").length },
-    { id: "5", name: "Due Today", selected: activeFilter === "5", count: tasks.filter(t => t.dueDate && isToday(t.dueDate)).length },
-    { id: "6", name: "Overdue", selected: activeFilter === "6", count: tasks.filter(t => t.dueDate && isOverdue(t.dueDate)).length },
+    { id: "1", name: "All Tasks", icon: List, selected: activeFilter === "1", count: tasks.length },
+    { id: "2", name: "Active", icon: Square, selected: activeFilter === "2", count: tasks.filter(t => !t.completed).length },
+    { id: "3", name: "Completed", icon: CheckSquare, selected: activeFilter === "3", count: tasks.filter(t => t.completed).length },
+    { id: "4", name: "High Priority", icon: AlertCircle, selected: activeFilter === "4", count: tasks.filter(t => t.priority === "high").length },
+    { id: "5", name: "Due Today", icon: Calendar, selected: activeFilter === "5", count: tasks.filter(t => t.dueDate && isToday(t.dueDate)).length },
+    { id: "6", name: "Overdue", icon: Clock, selected: activeFilter === "6", count: tasks.filter(t => t.dueDate && isOverdue(t.dueDate)).length },
   ];
 
   // Filter tasks based on active filter
@@ -250,6 +259,19 @@ export const Tasks = (): JSX.Element => {
     }, 200);
   };
 
+  // Command palette handler functions
+  const handleSetFilter = (filterId: string) => {
+    setActiveFilter(filterId);
+  };
+
+  const handleClearCompleted = () => {
+    setTasks(tasks.filter(task => !task.completed));
+  };
+
+  const handleToggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -320,7 +342,11 @@ export const Tasks = (): JSX.Element => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="p-0 h-auto hover:bg-transparent group">
                     <div className="flex items-center gap-3">
-                      <img src="/Slane.png" alt="Slane" className="w-6 h-6 rounded-sm shadow-sm" />
+                      <img 
+                        src={theme === 'dark' ? "/slane-dark.png" : "/Slane.png"} 
+                        alt="Slane" 
+                        className="w-6 h-6 rounded-sm shadow-sm" 
+                      />
                       <span className="font-normal text-sm text-gray-900 dark:text-white">Slane</span>
                       <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6] group-hover:text-gray-600 dark:group-hover:text-white transition-colors" />
                     </div>
@@ -370,27 +396,32 @@ export const Tasks = (): JSX.Element => {
               <div className="space-y-3 mb-6">
                 {/* Tasks Header */}
                 <div className="flex items-center justify-between">
-                  <span className="font-normal text-sm text-gray-900 dark:text-white">Filters</span>
-                  <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6]" />
+                  <span className="font-normal text-sm text-gray-900 dark:text-white">Overviews</span>
                 </div>
 
                 {/* Task List */}
                 <div className="space-y-1">
-                  {sidebarItems.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => setActiveFilter(item.id)}
-                      className={`flex items-center justify-between p-2.5 rounded-sm text-sm transition-all hover:bg-gray-100/40 dark:hover:bg-[#2c2c2e] cursor-pointer ${item.selected ? "bg-gray-100/80 dark:bg-[#2c2c2e]" : ""
-                        }`}
-                    >
-                      <span className="text-gray-700 dark:text-[#a1a1a6] truncate text-sm font-normal">
-                        {item.name}
-                      </span>
-                      <span className="text-xs text-gray-400 dark:text-[#6d6d70] bg-gray-100 dark:bg-[#2c2c2e] px-2 py-0.5 rounded-sm">
-                        {item.count}
-                      </span>
-                    </div>
-                  ))}
+                  {sidebarItems.map((item) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => setActiveFilter(item.id)}
+                        className={`flex items-center justify-between p-2.5 rounded-sm text-sm transition-all hover:bg-gray-100/40 dark:hover:bg-[#2c2c2e] cursor-pointer ${item.selected ? "bg-gray-100/80 dark:bg-[#2c2c2e]" : ""
+                          }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <IconComponent className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6]" />
+                          <span className="text-gray-700 dark:text-[#a1a1a6] truncate text-sm font-normal">
+                            {item.name}
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-400 dark:text-[#6d6d70] bg-gray-100 dark:bg-[#2c2c2e] px-2 py-0.5 rounded-sm">
+                          {item.count}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -611,9 +642,27 @@ export const Tasks = (): JSX.Element => {
                     </div>
                     <div className="w-24">
                       {task.dueDate && (
-                        <div className={`text-xs ${formatDueDate(task.dueDate).className}`}>
-                          {formatDueDate(task.dueDate).text}
-                        </div>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className={`text-xs ${formatDueDate(task.dueDate).className} hover:underline cursor-pointer transition-all duration-150 hover:opacity-80 bg-transparent border-none p-0 font-inherit`}>
+                              {formatDueDate(task.dueDate).text}
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto overflow-hidden p-0 bg-white dark:bg-[#2c2c2e] border-gray-200/60 dark:border-[#3a3a3c] shadow-sm" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={task.dueDate}
+                              captionLayout="dropdown"
+                              onSelect={(date) => {
+                                if (date) {
+                                  editTask(task.id, { dueDate: date });
+                                }
+                              }}
+                              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                              className="rounded-md border-0"
+                            />
+                          </PopoverContent>
+                        </Popover>
                       )}
                     </div>
                     <div className="w-10">
@@ -678,8 +727,28 @@ export const Tasks = (): JSX.Element => {
                           )}
                         </div>
                         {task.dueDate && (
-                          <div className={`mt-1 text-xs ${formatDueDate(task.dueDate).className}`}>
-                            Due {formatDueDate(task.dueDate).text}
+                          <div className="mt-1">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button className={`text-xs ${formatDueDate(task.dueDate).className} hover:underline cursor-pointer transition-all duration-150 hover:opacity-80 text-left bg-transparent border-none p-0 font-inherit`}>
+                                  Due {formatDueDate(task.dueDate).text}
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto overflow-hidden p-0 bg-white dark:bg-[#2c2c2e] border-gray-200/60 dark:border-[#3a3a3c] shadow-sm" align="start">
+                                <CalendarComponent
+                                  mode="single"
+                                  selected={task.dueDate}
+                                  captionLayout="dropdown"
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      editTask(task.id, { dueDate: date });
+                                    }
+                                  }}
+                                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                  className="rounded-md border-0"
+                                />
+                              </PopoverContent>
+                            </Popover>
                           </div>
                         )}
                         {task.description && expandedTasks.has(task.id) && (
@@ -780,6 +849,9 @@ export const Tasks = (): JSX.Element => {
           setCommandPaletteOpen(false);
           setNewTaskModalOpen(true);
         }}
+        onSetFilter={handleSetFilter}
+        onClearCompleted={handleClearCompleted}
+        onToggleSidebar={handleToggleSidebar}
       />
 
       {/* Edit Task Modal */}

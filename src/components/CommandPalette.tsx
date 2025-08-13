@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Plus, Settings, Trash2, Filter } from 'lucide-react';
+import { Search, Plus, Settings, Trash2, List, CheckSquare, Square, AlertCircle, PanelLeft, Calendar, Clock } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface Command {
@@ -15,6 +15,9 @@ interface CommandPaletteProps {
   onClose: () => void;
   onOpenSettings: () => void;
   onCreateTask: () => void;
+  onSetFilter: (filterId: string) => void;
+  onClearCompleted: () => void;
+  onToggleSidebar: () => void;
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
@@ -22,12 +25,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onClose,
   onOpenSettings,
   onCreateTask,
+  onSetFilter,
+  onClearCompleted,
+  onToggleSidebar,
 }) => {
   const { theme } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const commandsContainerRef = useRef<HTMLDivElement>(null);
+  const commandRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const commands: Command[] = [
     {
@@ -50,11 +58,65 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       }
     },
     {
+      id: 'toggle-sidebar',
+      label: 'Toggle Sidebar',
+      icon: PanelLeft,
+      action: () => {
+        onToggleSidebar();
+        handleClose();
+      }
+    },
+    {
       id: 'filter-all',
       label: 'Show All Tasks',
-      icon: Filter,
+      icon: List,
       action: () => {
-        // Add filter logic here
+        onSetFilter('1');
+        handleClose();
+      }
+    },
+    {
+      id: 'filter-active',
+      label: 'Show Active Tasks',
+      icon: Square,
+      action: () => {
+        onSetFilter('2');
+        handleClose();
+      }
+    },
+    {
+      id: 'filter-completed',
+      label: 'Show Completed Tasks',
+      icon: CheckSquare,
+      action: () => {
+        onSetFilter('3');
+        handleClose();
+      }
+    },
+    {
+      id: 'filter-high-priority',
+      label: 'Show High Priority Tasks',
+      icon: AlertCircle,
+      action: () => {
+        onSetFilter('4');
+        handleClose();
+      }
+    },
+    {
+      id: 'filter-due-today',
+      label: 'Show Due Today Tasks',
+      icon: Calendar,
+      action: () => {
+        onSetFilter('5');
+        handleClose();
+      }
+    },
+    {
+      id: 'filter-overdue',
+      label: 'Show Overdue Tasks',
+      icon: Clock,
+      action: () => {
+        onSetFilter('6');
         handleClose();
       }
     },
@@ -63,7 +125,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       label: 'Clear Completed',
       icon: Trash2,
       action: () => {
-        // Add clear completed logic here
+        onClearCompleted();
         handleClose();
       }
     }
@@ -89,6 +151,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   useEffect(() => {
     setSelectedIndex(0);
   }, [searchQuery]);
+
+  // Scroll selected item into view
+  useEffect(() => {
+    const selectedElement = commandRefs.current[selectedIndex];
+    if (selectedElement && commandsContainerRef.current) {
+      selectedElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }, [selectedIndex]);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -157,7 +230,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         </div>
 
         {/* Commands List */}
-        <div className="overflow-y-auto scrollbar-minimal max-h-80">
+        <div ref={commandsContainerRef} className="overflow-y-auto scrollbar-minimal max-h-48">
           {filteredCommands.length === 0 ? (
             <div className="px-4 py-8 text-center text-gray-500 dark:text-[#6d6d70]">
               <Search className="w-6 h-6 mx-auto mb-2 text-gray-300 dark:text-[#6d6d70]" />
@@ -170,6 +243,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 return (
                   <button
                     key={command.id}
+                    ref={(el) => (commandRefs.current[index] = el)}
                     onClick={command.action}
                     className={`w-full flex items-center px-4 py-2.5 text-left transition-colors duration-150 ${
                       index === selectedIndex
