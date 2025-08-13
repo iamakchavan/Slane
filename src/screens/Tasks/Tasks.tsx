@@ -591,7 +591,6 @@ export const Tasks = (): JSX.Element => {
           <div className="border border-gray-200/60 dark:border-[#3a3a3c] rounded-sm bg-white dark:bg-[#1c1c1e] shadow-sm hover:shadow-sm transition-shadow">
             {/* Sticky Desktop Table Header */}
             <div className="hidden md:flex items-center gap-4 p-4 border-b border-gray-200/60 dark:border-[#3a3a3c] bg-gray-50/20 dark:bg-[#2c2c2e]/20 sticky top-0 z-10">
-              <div className="w-6" />
               <div className="flex-1">
                 <span className="font-normal text-sm text-gray-600 dark:text-[#a1a1a6]">Your tasks</span>
               </div>
