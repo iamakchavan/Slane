@@ -32,7 +32,6 @@ import { PricingModal } from "../../components/PricingModal";
 import { SettingsModal } from "../../components/SettingsModal";
 import { CommandPalette } from "../../components/CommandPalette";
 import { EditTaskModal } from "../../components/EditTaskModal";
-import { DatePicker } from "../../components/DatePicker";
 import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover";
 import { Calendar as CalendarComponent } from "../../components/ui/calendar";
 import { useTheme } from "../../contexts/ThemeContext";
