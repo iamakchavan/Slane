@@ -15,7 +15,8 @@ import {
   CheckSquare,
   AlertCircle,
   Calendar,
-  Clock
+  Clock,
+  Check
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
@@ -342,10 +343,10 @@ export const Tasks = (): JSX.Element => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="p-0 h-auto hover:bg-transparent group">
                     <div className="flex items-center gap-3">
-                      <img 
-                        src={theme === 'dark' ? "/slane-dark.png" : "/Slane.png"} 
-                        alt="Slane" 
-                        className="w-6 h-6 rounded-sm shadow-sm" 
+                      <img
+                        src={theme === 'dark' ? "/slane-dark.png" : "/Slane.png"}
+                        alt="Slane"
+                        className="w-6 h-6 rounded-sm shadow-sm"
                       />
                       <span className="font-normal text-sm text-gray-900 dark:text-white">Slane</span>
                       <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6] group-hover:text-gray-600 dark:group-hover:text-white transition-colors" />
@@ -429,23 +430,36 @@ export const Tasks = (): JSX.Element => {
             {/* User Profile - Positioned at bottom */}
             <div className="border-t border-gray-200/60 dark:border-[#3a3a3c] pt-4 mt-auto pb-1">
               {!showAccountUI ? (
-                <div
-                  className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-gray-100/40 dark:hover:bg-[#2c2c2e] cursor-pointer transition-colors"
-                  onClick={() => setShowAccountUI(true)}
-                >
-                  <Avatar className="w-8 h-8 shadow-sm">
-                    <AvatarImage src="/inbox-2.png" alt="User avatar" />
-                    <AvatarFallback className="text-xs bg-gray-100 dark:bg-[#3a3a3c] text-gray-600 dark:text-[#a1a1a6] font-normal">BC</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-normal truncate text-gray-900 dark:text-white">
-                      Bittu Creators
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6]">
-                      Free Plan
-                    </p>
+                <div className="space-y-3">
+                  {/* Upgrade to Pro Button */}
+                  <Button
+                    onClick={() => setShowPricingModal(true)}
+                    className="w-full bg-gray-900 dark:bg-gray-800 hover:bg-gray-800 dark:hover:bg-gray-700 text-white dark:text-white text-sm font-medium py-2.5 rounded-sm transition-all flex items-center justify-center gap-2"
+                  >
+                    <div className="w-4 h-4 border border-current rounded-full flex items-center justify-center">
+                      <Check className="w-2.5 h-2.5" />
+                    </div>
+                    Upgrade to Pro
+                  </Button>
+
+                  {/* User Profile */}
+                  <div
+                    className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-gray-100/40 dark:hover:bg-[#2c2c2e] cursor-pointer transition-colors"
+                    onClick={() => setShowAccountUI(true)}
+                  >
+                    <Avatar className="w-10 h-10 shadow-sm !rounded-none">
+                      <AvatarImage src="/inbox-2.png" alt="User avatar" className="!rounded-none" />
+                      <AvatarFallback className="text-sm bg-gray-100 dark:bg-[#3a3a3c] text-gray-600 dark:text-[#a1a1a6] font-normal !rounded-none">V</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate text-gray-900 dark:text-white">
+                        Venkat
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-[#a1a1a6] truncate">
+                        bittucreators@gmail.com
+                      </p>
+                    </div>
                   </div>
-                  <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-[#a1a1a6]" />
                 </div>
               ) : (
                 isAccountPanelVisible && (
@@ -481,9 +495,9 @@ export const Tasks = (): JSX.Element => {
                       {/* Profile Section */}
                       <div className="space-y-3">
                         <div className="flex items-center gap-3 p-2.5 bg-gray-50/50 dark:bg-[#2c2c2e] rounded-sm">
-                          <Avatar className="w-10 h-10 shadow-sm">
-                            <AvatarImage src="/inbox-2.png" alt="User avatar" />
-                            <AvatarFallback className="text-sm bg-gray-100 dark:bg-[#3a3a3c] text-gray-600 dark:text-[#a1a1a6] font-normal">BC</AvatarFallback>
+                          <Avatar className="w-10 h-10 shadow-sm !rounded-none">
+                            <AvatarImage src="/inbox-2.png" alt="User avatar" className="!rounded-none" />
+                            <AvatarFallback className="text-sm bg-gray-100 dark:bg-[#3a3a3c] text-gray-600 dark:text-[#a1a1a6] font-normal !rounded-none">BC</AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 dark:text-white">
@@ -578,9 +592,9 @@ export const Tasks = (): JSX.Element => {
           <div className="border border-gray-200/60 dark:border-[#3a3a3c] rounded-sm bg-white dark:bg-[#1c1c1e] shadow-sm hover:shadow-sm transition-shadow">
             {/* Sticky Desktop Table Header */}
             <div className="hidden md:flex items-center gap-4 p-4 border-b border-gray-200/60 dark:border-[#3a3a3c] bg-gray-50/20 dark:bg-[#2c2c2e]/20 sticky top-0 z-10">
-              <Checkbox className="border-gray-300/80 dark:border-[#6d6d70] data-[state=checked]:bg-gray-900 dark:data-[state=checked]:bg-white data-[state=checked]:border-gray-900 dark:data-[state=checked]:border-white" />
+              <div className="w-6" />
               <div className="flex-1">
-                <span className="font-normal text-sm text-gray-600 dark:text-[#a1a1a6]">Name</span>
+                <span className="font-normal text-sm text-gray-600 dark:text-[#a1a1a6]">Your tasks</span>
               </div>
               <div className="w-24">
                 <span className="font-normal text-sm text-gray-600 dark:text-[#a1a1a6]">Priority</span>
@@ -612,9 +626,8 @@ export const Tasks = (): JSX.Element => {
                       >
                         {task.name}
                         {task.description && (
-                          <ChevronDownIcon className={`inline ml-2 w-3 h-3 text-gray-400 dark:text-[#6d6d70] transition-transform duration-200 ease-out ${
-                            expandedTasks.has(task.id) ? 'rotate-0' : '-rotate-90'
-                          }`} />
+                          <ChevronDownIcon className={`inline ml-2 w-3 h-3 text-gray-400 dark:text-[#6d6d70] transition-transform duration-200 ease-out ${expandedTasks.has(task.id) ? 'rotate-0' : '-rotate-90'
+                            }`} />
                         )}
                       </div>
                       {task.description && expandedTasks.has(task.id) && (
@@ -721,9 +734,8 @@ export const Tasks = (): JSX.Element => {
                         >
                           {task.name}
                           {task.description && (
-                            <ChevronDownIcon className={`inline ml-2 w-3 h-3 text-gray-400 dark:text-[#6d6d70] transition-transform duration-200 ease-out ${
-                              expandedTasks.has(task.id) ? 'rotate-0' : '-rotate-90'
-                            }`} />
+                            <ChevronDownIcon className={`inline ml-2 w-3 h-3 text-gray-400 dark:text-[#6d6d70] transition-transform duration-200 ease-out ${expandedTasks.has(task.id) ? 'rotate-0' : '-rotate-90'
+                              }`} />
                           )}
                         </div>
                         {task.dueDate && (
